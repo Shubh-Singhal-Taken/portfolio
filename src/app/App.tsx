@@ -8,10 +8,10 @@ import { AnimatedParticles } from "./components/AnimatedParticles";
 import { Navbar } from "./components/Navbar";
 import { StatsCard } from "./components/StatsCard";
 import { TechOrbit } from "./components/TechOrbit";
-import { 
-  Mail, 
-  Github, 
-  Linkedin, 
+import {
+  Mail,
+  Github,
+  Linkedin,
   ExternalLink,
   Cpu,
   Brain,
@@ -240,7 +240,7 @@ export default function App() {
                     </div>
                     <h3 className="text-2xl text-white">Education</h3>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <div className="flex gap-3">
                       <div className="flex flex-col items-center">
@@ -256,7 +256,7 @@ export default function App() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-3 pt-4 border-t border-cyan-500/20">
                       <div className="text-center p-3 bg-cyan-500/10 rounded-lg">
                         <div className="text-xl text-cyan-400 font-mono">8.7</div>
@@ -281,7 +281,7 @@ export default function App() {
                     </div>
                     <h3 className="text-2xl text-white">Goals & Interests</h3>
                   </div>
-                  
+
                   <div className="space-y-3">
                     {[
                       "Smart IoT systems & edge computing",
@@ -306,9 +306,9 @@ export default function App() {
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-600 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
               <div className="relative bg-[#0f0f23]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
                 <p className="text-gray-300 leading-relaxed">
-                  I'm a passionate developer dedicated to creating innovative solutions at the intersection of AI, ML, and IoT. 
-                  My journey involves building intelligent systems that solve real-world problems, from smart home automation 
-                  to predictive analytics. I'm constantly exploring new technologies and looking forward to contributing to 
+                  I'm a passionate developer dedicated to creating innovative solutions at the intersection of AI, ML, and IoT.
+                  My journey involves building intelligent systems that solve real-world problems, from smart home automation
+                  to predictive analytics. I'm constantly exploring new technologies and looking forward to contributing to
                   cutting-edge projects in the tech industry. Currently seeking opportunities in AI/IoT startups and research labs.
                 </p>
               </div>
@@ -400,7 +400,7 @@ export default function App() {
                 description="Spearheaded technical initiatives, organizing workshops, seminars, and hackathons to promote innovation in AI, IoT, and software development. Mentored junior students on project development, Git practices, and technical career-building."
                 icon={<Users className="w-4 h-4 text-white" />}
               />
-              
+
               <ExperienceCard
                 title="Winner - Tech-Expo 2024"
                 organization="Project SARV"
@@ -408,7 +408,7 @@ export default function App() {
                 description="Won the Tech-Expo 2024 for developing Project SARV. Recognized with Best Innovation Award for the external ADAS Kit project demonstration showcasing advanced driver assistance capabilities."
                 icon={<Trophy className="w-4 h-4 text-white" />}
               />
-              
+
               <ExperienceCard
                 title="Selected - Google Dev House Hackathon"
                 organization="VIT Chennai"
@@ -416,7 +416,7 @@ export default function App() {
                 description="Selected for the prestigious Google Dev House Hackathon 2025 held at VIT Chennai. Competing among top developers nationwide to build innovative solutions."
                 icon={<Sparkles className="w-4 h-4 text-white" />}
               />
-              
+
               <ExperienceCard
                 title="Workshop Organizer & Mentor"
                 organization="GLA University"
@@ -462,7 +462,7 @@ export default function App() {
                         type="text"
                         required
                         value={formData.name}
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="w-full px-4 py-3 bg-black/50 border border-cyan-500/30 rounded-lg focus:border-cyan-400 focus:outline-none transition-colors text-white font-mono"
                         placeholder="Your name"
                       />
@@ -473,7 +473,7 @@ export default function App() {
                         type="email"
                         required
                         value={formData.email}
-                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         className="w-full px-4 py-3 bg-black/50 border border-cyan-500/30 rounded-lg focus:border-cyan-400 focus:outline-none transition-colors text-white font-mono"
                         placeholder="your.email@example.com"
                       />
@@ -483,7 +483,7 @@ export default function App() {
                       <textarea
                         required
                         value={formData.message}
-                        onChange={(e) => setFormData({...formData, message: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                         rows={4}
                         className="w-full px-4 py-3 bg-black/50 border border-cyan-500/30 rounded-lg focus:border-cyan-400 focus:outline-none transition-colors resize-none text-white font-mono"
                         placeholder="Your message..."
@@ -576,7 +576,7 @@ export default function App() {
                 <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-lg flex items-center justify-center">
                   <Zap className="w-5 h-5 text-white" />
                 </div>
-                <span className="font-mono text-gray-400">SS.dev</span>
+                <span className="font-mono text-gray-400">shubhsinghal.in</span>
               </div>
               <p className="text-gray-400 text-sm font-mono">
                 © 2026 Shubh Singhal • Built with React & Tailwind CSS

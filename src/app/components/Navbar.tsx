@@ -29,11 +29,10 @@ export function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
           ? 'bg-[#0a0a1a]/80 backdrop-blur-xl border-b border-cyan-500/20'
           : 'bg-transparent'
-      }`}
+        }`}
     >
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
@@ -49,7 +48,7 @@ export function Navbar() {
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-lg blur-lg opacity-50 group-hover:opacity-75 transition-opacity"></div>
             </div>
             <span className="font-mono bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-              SS.dev
+              shubhsinghal.in
             </span>
           </button>
 

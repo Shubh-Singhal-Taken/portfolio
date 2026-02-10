@@ -66,22 +66,22 @@
     "tailwindcss": "4.1.12",
     "vite": "6.3.5"
   },
-  "devDependencies": {
-    "peerDependencies": {
-      "react": "18.3.1",
-      "react-dom": "18.3.1"
+  "devDependencies": {},
+  "peerDependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
     },
-    "peerDependenciesMeta": {
-      "react": {
-        "optional": true
-      },
-      "react-dom": {
-        "optional": true
-      }
-    },
-    "pnpm": {
-      "overrides": {
-        "vite": "6.3.5"
-      }
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "pnpm": {
+    "overrides": {
+      "vite": "6.3.5"
     }
   }
+}

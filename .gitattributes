@@ -1,0 +1,6 @@
+# Ensure proper line endings and file permissions
+* text=auto eol=lf
+
+# Ensure shell scripts and executables have proper permissions
+*.sh text eol=lf
+node_modules/.bin/* binary

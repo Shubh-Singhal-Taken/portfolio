@@ -1,593 +1,729 @@
-import { useState } from "react";
-import { ProjectCard } from "./components/ProjectCard";
-import { SkillCategory } from "./components/SkillCategory";
-import { ExperienceCard } from "./components/ExperienceCard";
-import { CircuitBackground } from "./components/CircuitBackground";
-import { TechGrid } from "./components/TechGrid";
-import { AnimatedParticles } from "./components/AnimatedParticles";
-import { Navbar } from "./components/Navbar";
-import { StatsCard } from "./components/StatsCard";
-import { TechOrbit } from "./components/TechOrbit";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import {
-  Mail,
+  ArrowUpRight,
+  Binary,
+  BrainCircuit,
+  ChevronRight,
   Github,
   Linkedin,
+  Mail,
+  Menu,
+  Radar,
+  Send,
+  Sparkles,
+  X,
+  Terminal,
   ExternalLink,
+  Folder,
   Cpu,
   Brain,
-  Code,
-  Database,
-  Wifi,
-  Sparkles,
-  Trophy,
-  Award,
-  Users,
-  BookOpen,
-  Send,
-  Terminal,
-  Layers,
-  GitBranch,
-  Server,
-  Cloud,
-  Smartphone,
-  Activity,
-  Zap,
-  Rocket,
-  Target,
+  Globe,
   Code2,
-  ChevronRight
+  Cloud,
+  Database,
+  Wrench,
+  Users,
+  Lightbulb,
+  Target,
+  MessageCircle,
+  Zap
 } from "lucide-react";
 
-export default function App() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: ""
-  });
+/* ── Data ───────────────────────────────────────────── */
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert("Thank you for your message! I'll get back to you soon.");
-    setFormData({ name: "", email: "", message: "" });
-  };
+const nav = [
+  { label: "Home", href: "#home" },
+  { label: "About", href: "#about" },
+  { label: "Skills", href: "#skills" },
+  { label: "Projects", href: "#projects" },
+  { label: "Experience", href: "#experience" },
+  { label: "Contact", href: "#contact" }
+];
 
-  const projects = [
+const stats = [
+  { value: "15+", label: "Flagship Builds" },
+  { value: "8+", label: "Awards & Selections" },
+  { value: "350+", label: "Developers Impacted" },
+  { value: "2026", label: "Graduation Target" }
+];
+
+const pillars = [
+  {
+    title: "AI Vision Engineering",
+    text: "From object detection to adaptive tracking, I architect perception pipelines that stay performant in real-world noise.",
+    icon: BrainCircuit
+  },
+  {
+    title: "Embedded Intelligence",
+    text: "I integrate microcontrollers, sensors, and edge compute into systems that are fast, reliable, and field-ready.",
+    icon: Radar
+  },
+  {
+    title: "Product-Led Delivery",
+    text: "I prioritize measurable outcomes, clean architecture, and iteration velocity to move products from prototype to production.",
+    icon: Binary
+  }
+];
+
+const technicalSkillGroups = [
+  {
+    category: "Embedded & IoT",
+    icon: Cpu,
+    accent: "#64deff",
+    skills: [
+      "Arduino", "Raspberry Pi", "ESP32", "ESP8266/NodeMCU", "STM32", "ATmega328",
+      "ROS", "LiDAR", "Pixhawk", "Embedded C",
+      "DHT11/22", "MPU6050", "BMP280", "HC-SR04", "IR Sensor", "PIR Sensor", "MQ Gas Sensors",
+      "Servo Motor", "Stepper Motor", "Relay Module", "L298N Motor Driver",
+      "MQTT", "I2C", "SPI", "UART", "Bluetooth/BLE", "LoRa", "Zigbee", "Wi-Fi",
+      "Sensor Fusion", "FreeRTOS", "PlatformIO", "Blynk", "ThingSpeak", "Node-RED"
+    ]
+  },
+  {
+    category: "AI / ML",
+    icon: Brain,
+    accent: "#a78bfa",
+    skills: [
+      "Python", "TensorFlow", "PyTorch", "OpenCV", "Scikit-Learn", "YOLO", "Pandas", "NumPy",
+      "LangChain", "LlamaIndex", "Hugging Face", "OpenAI API", "CrewAI", "AutoGen",
+      "RAG Pipelines", "Vector Databases", "Pinecone", "ChromaDB", "FAISS",
+      "Prompt Engineering", "Fine-Tuning", "LoRA/QLoRA", "Transformers",
+      "Stable Diffusion", "LLM Orchestration", "Agentic Workflows", "Semantic Search"
+    ]
+  },
+  {
+    category: "DevOps & Cloud",
+    icon: Cloud,
+    accent: "#34d399",
+    skills: ["Docker", "Kubernetes", "Jenkins", "Terraform", "Ansible", "AWS", "CI/CD", "Linux", "Nginx", "Git"]
+  },
+  {
+    category: "Languages",
+    icon: Code2,
+    accent: "#f59e0b",
+    skills: ["Python", "C/C++", "JavaScript", "TypeScript", "Bash", "SQL"]
+  },
+  {
+    category: "Web & Tools",
+    icon: Globe,
+    accent: "#fb7185",
+    skills: ["React", "Node.js", "HTML/CSS", "REST APIs", "Figma", "VS Code", "Postman"]
+  }
+];
+
+const softSkills = [
+  { label: "Leadership", icon: Users },
+  { label: "Problem Solving", icon: Lightbulb },
+  { label: "Strategic Thinking", icon: Target },
+  { label: "Team Collaboration", icon: Users },
+  { label: "Communication", icon: MessageCircle },
+  { label: "Quick Learner", icon: Zap },
+  { label: "Project Management", icon: Wrench },
+  { label: "Mentoring", icon: Sparkles }
+];
+
+type Domain = "all" | "iot" | "ai-ml" | "web";
+
+const domains: { key: Domain; label: string; dir: string; icon: typeof Folder; accent: string }[] = [
+  { key: "all", label: "All Projects", dir: "./all", icon: Folder, accent: "#64deff" },
+  { key: "iot", label: "IoT & Embedded", dir: "./iot", icon: Cpu, accent: "#34d399" },
+  { key: "ai-ml", label: "AI / ML", dir: "./ai-ml", icon: Brain, accent: "#a78bfa" },
+  { key: "web", label: "Web & Software", dir: "./web", icon: Globe, accent: "#f59e0b" }
+];
+
+const projects: {
+  title: string;
+  summary: string;
+  impact: string;
+  tags: string[];
+  domain: Domain;
+}[] = [
     {
-      title: "AAROI - Autonomous Rover",
-      description: "Developed an autonomous rover using ROS for control and LiDAR for obstacle detection. Programmed hardware with Embedded C and integrated OpenCV for object tracking and environmental awareness.",
-      image: "https://images.unsplash.com/photo-1761195696590-3490ea770aa1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyb2JvdGljcyUyMGF1dG9tYXRpb24lMjB0ZWNobm9sb2d5fGVufDF8fHx8MTc3MDE3OTgzN3ww&ixlib=rb-4.1.0&q=80&w=1080",
-      tags: ["Python", "Embedded C", "OpenCV", "ROS", "LiDAR"],
-      githubUrl: "#"
+      title: "AAROI Autonomous Rover",
+      summary:
+        "Built an autonomous rover with LiDAR obstacle mapping and OpenCV tracking for controlled navigation in dynamic terrain.",
+      impact: "Achieved stable autonomous routing under multi-obstacle test scenarios.",
+      tags: ["ROS", "OpenCV", "LiDAR", "Embedded C"],
+      domain: "iot"
     },
     {
-      title: "GARUDA: Surveillance Drone",
-      description: "Engineered a surveillance drone using Pixhawk 2.4.8 and Mission Planner. Integrated Raspberry Pi with Python scripts for live video feeds and OpenCV-based real-time object detection and tracking.",
-      image: "https://images.unsplash.com/photo-1724343025504-3afb6d67566b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxJb1QlMjBzbWFydCUyMGhvbWUlMjBhdXRvbWF0aW9ufGVufDF8fHx8MTc3MDI5MjcwNHww&ixlib=rb-4.1.0&q=80&w=1080",
-      tags: ["Python", "Pixhawk", "OpenCV", "Raspberry Pi"],
-      githubUrl: "#"
+      title: "GARUDA Surveillance Drone",
+      summary:
+        "Designed a surveillance stack combining Pixhawk control, Raspberry Pi edge processing, and real-time visual detection.",
+      impact: "Delivered consistent aerial target detection with live inference feedback.",
+      tags: ["Pixhawk", "Raspberry Pi", "Python", "Mission Planner"],
+      domain: "iot"
     },
     {
-      title: "ADAS Kit for Legacy Vehicles",
-      description: "Designed and implemented Advanced Driver Assistance System using Raspberry Pi and sensors. Integrated OpenCV-based computer vision for lane detection, object tracking, and real-time alert generation.",
-      image: "https://images.unsplash.com/photo-1758577515333-e71b713059f1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzbWFydCUyMHNlbnNvcnMlMjBjaXJjdWl0JTIwYm9hcmQ8ZW58MXx8fHwxNzcwMjkyNzA2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      tags: ["Python", "Embedded C", "OpenCV", "Raspberry Pi", "LoRaWAN"],
-      githubUrl: "#"
+      title: "ADAS Retrofit Suite",
+      summary:
+        "Engineered an ADAS kit for legacy vehicles with lane awareness and hazard alerting via edge computer vision.",
+      impact: "Recognized at Tech-Expo for practical, scalable road-safety innovation.",
+      tags: ["Computer Vision", "Sensor Fusion", "Edge Alerts", "Embedded Systems"],
+      domain: "ai-ml"
     }
   ];
 
-  const iotSkills = [
-    { name: "Raspberry Pi", icon: Server },
-    { name: "Arduino", icon: Cpu },
-    { name: "ESP8266", icon: Cpu },
-    { name: "Node MCU", icon: Wifi },
-    { name: "LiDAR", icon: Sparkles },
-    { name: "Pixhawk", icon: Cloud }
-  ];
+const timeline = [
+  {
+    period: "2025 — Present",
+    role: "President, CSED Club",
+    detail: "Leading strategy, mentoring teams, and scaling AI/IoT initiatives across the technical community."
+  },
+  {
+    period: "2024 — 2025",
+    role: "General Secretary, CSED Club",
+    detail: "Drove workshops, hackathons, and hands-on project mentoring for junior developers."
+  },
+  {
+    period: "2024",
+    role: "Winner, Tech-Expo",
+    detail: "Awarded for delivering an applied ADAS innovation with strong real-world safety value."
+  }
+];
 
-  const aimlSkills = [
-    { name: "OpenCV", icon: Sparkles },
-    { name: "Python", icon: Code },
-    { name: "ROS", icon: Brain },
-    { name: "Computer Vision", icon: Brain },
-    { name: "Embedded Systems", icon: Layers },
-    { name: "Machine Learning", icon: Database }
-  ];
+const tickerItems = [
+  "EDGE AI", "DOCKER", "AUTONOMOUS SYSTEMS", "KUBERNETES", "COMPUTER VISION",
+  "CI/CD PIPELINES", "EMBEDDED ARCHITECTURE", "TERRAFORM", "SENSOR FUSION",
+  "AWS", "DEEP LEARNING", "JENKINS", "IoT ENGINEERING", "ANSIBLE",
+  "HARDWARE + SOFTWARE CO-DESIGN", "LINUX ADMINISTRATION",
+  // duplicate for seamless loop
+  "EDGE AI", "DOCKER", "AUTONOMOUS SYSTEMS", "KUBERNETES", "COMPUTER VISION",
+  "CI/CD PIPELINES", "EMBEDDED ARCHITECTURE", "TERRAFORM", "SENSOR FUSION",
+  "AWS", "DEEP LEARNING", "JENKINS", "IoT ENGINEERING", "ANSIBLE",
+  "HARDWARE + SOFTWARE CO-DESIGN", "LINUX ADMINISTRATION"
+];
 
-  const programmingSkills = [
-    { name: "Python", icon: Code },
-    { name: "Embedded C", icon: Terminal },
-    { name: "Java", icon: Code },
-    { name: "Git", icon: GitBranch },
-    { name: "Docker", icon: Server },
-    { name: "VS Code", icon: Terminal }
-  ];
+/* ── Animation variants ─────────────────────────────── */
+
+const ease = [0.25, 0.46, 0.45, 0.94] as const;
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: (delay: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease, delay }
+  })
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.12, delayChildren: 0.1 }
+  }
+};
+
+const staggerChild = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease }
+  }
+};
+
+/* ── Component ──────────────────────────────────────── */
+
+export default function App() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [loading, setLoading] = useState(true);
+  const [activeDomain, setActiveDomain] = useState<Domain>("all");
+
+  const filteredProjects = activeDomain === "all"
+    ? projects
+    : projects.filter((p) => p.domain === activeDomain);
+
+  const activeDomainData = domains.find((d) => d.key === activeDomain)!;
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2600);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    alert("Message sent! I'll get back to you soon.");
+    setFormData({ name: "", email: "", message: "" });
+  };
 
   return (
-    <div className="min-h-screen bg-[#0a0a1a] text-white overflow-hidden">
-      {/* Background Effects */}
-      <CircuitBackground />
-      <TechGrid />
-      <AnimatedParticles />
+    <>
+      {/* ── Loading Screen ── */}
+      <div className={`loading-screen ${!loading ? "loaded" : ""}`}>
+        <p className="loader-text">
+          <span className="prompt">&gt;</span> initializing system
+          <span className="cursor-blink">_</span>
+        </p>
+        <div className="loader-bar-track">
+          <div className="loader-bar-fill" />
+        </div>
+        <p className="loader-name">SHUBH SINGHAL</p>
+      </div>
 
-      {/* Navigation */}
-      <Navbar />
+      {/* ── Main Shell ── */}
+      <div className="portfolio-shell" style={{ opacity: loading ? 0 : 1, transition: "opacity 0.5s ease 0.3s" }}>
+        <div className="ambient-layer" />
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+        <div className="orb orb-3" />
+        <div className="scan-line" />
+        <div className="grid-layer" />
+        <div className="noise-layer" />
 
-      <div className="relative z-10">
-        {/* Hero Section */}
-        <section className="min-h-screen flex items-center justify-center px-6 pt-20">
-          <div className="max-w-7xl mx-auto w-full">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* Left Content */}
-              <div>
-                {/* Status Badge */}
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-full mb-6 group hover:bg-cyan-500/20 transition-all">
-                  <div className="relative">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <div className="absolute inset-0 w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
-                  </div>
-                  <span className="text-sm text-cyan-400 font-mono">Available for opportunities</span>
-                </div>
+        {/* ── Header ── */}
+        <header className="main-header">
+          <div className="container-row">
+            <a href="#home" className="brand">
+              <span className="brand-block">SS</span>
+              <span className="brand-text">SHUBH SINGHAL</span>
+            </a>
 
-                <h1 className="text-5xl md:text-7xl mb-4">
-                  <span className="block text-gray-400 text-2xl md:text-3xl mb-2 font-mono">
-                    {'<'}Hello World{' />'}
-                  </span>
-                  <span className="block bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    Shubh Singhal
-                  </span>
-                </h1>
+            <nav className="nav-desktop">
+              {nav.map((item) => (
+                <a key={item.href} href={item.href} className="nav-link">
+                  {item.label}
+                </a>
+              ))}
+              <a href="#contact" className="btn-solid" style={{ marginLeft: "0.5rem" }}>
+                Hire Me
+              </a>
+            </nav>
 
-                {/* Typing Effect Title */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-2 text-xl md:text-2xl">
-                    <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse" />
-                    <span className="text-cyan-400 font-mono">IoT & AI/ML Developer</span>
-                    <span className="w-2 h-6 bg-cyan-400 animate-pulse"></span>
-                  </div>
-                </div>
+            <button
+              className="nav-toggle"
+              onClick={() => setMenuOpen((prev) => !prev)}
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
 
-                <p className="text-lg text-gray-400 mb-8 leading-relaxed max-w-xl">
-                  Building the future at the intersection of{" "}
-                  <span className="text-cyan-400 font-semibold">Artificial Intelligence</span>,{" "}
-                  <span className="text-purple-400 font-semibold">Machine Learning</span>, and{" "}
-                  <span className="text-pink-400 font-semibold">Internet of Things</span>.
-                  Creating intelligent systems that bridge physical and digital worlds.
-                </p>
+          {menuOpen && (
+            <div className="mobile-nav">
+              {nav.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="nav-link"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {item.label}
+                </a>
+              ))}
+              <a href="#contact" className="btn-solid" style={{ marginTop: "0.5rem" }}>
+                Hire Me
+              </a>
+            </div>
+          )}
+        </header>
 
-                {/* CTA Buttons */}
-                <div className="flex flex-wrap gap-4 mb-8">
-                  <a
-                    href="#projects"
-                    className="group relative px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_40px_rgba(6,182,212,0.6)]"
-                  >
-                    <span className="relative z-10 flex items-center gap-2">
-                      View Projects
-                      <Rocket className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+        <main>
+          {/* ── Hero ── */}
+          <section id="home" className="hero container-grid">
+            <div className="hero-inner">
+              <motion.div
+                className="hero-content"
+                initial="hidden"
+                animate="visible"
+                variants={staggerContainer}
+              >
+                <motion.div variants={staggerChild}>
+                  <p className="kicker">
+                    <Sparkles size={13} /> AVAILABLE FOR AI & IOT ROLES
+                  </p>
+                </motion.div>
+
+                <motion.h1 className="hero-name" variants={staggerChild}>
+                  SHUBH<br />
+                  <span className="accent">SINGHAL</span>
+                </motion.h1>
+
+                <motion.p className="hero-tagline" variants={staggerChild}>
+                  Systems Architect · AI/ML Engineer
+                </motion.p>
+
+                <motion.p className="hero-description" variants={staggerChild}>
+                  I build elite intelligent systems that transform complex ideas into production
+                  reality — blending sensing, intelligence, and control with product-grade rigor.
+                </motion.p>
+
+                <motion.div className="hero-actions" variants={staggerChild}>
+                  <a href="#projects" className="btn-solid">
+                    View Work <ArrowUpRight size={15} />
+                  </a>
+                  <a href="#contact" className="btn-ghost">
+                    Let's Talk <Send size={15} />
+                  </a>
+                </motion.div>
+              </motion.div>
+
+              {/* Terminal Card */}
+              <motion.div
+                className="hero-visual"
+                initial={{ opacity: 0, x: 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+              >
+                <div className="terminal-card">
+                  <div className="terminal-header">
+                    <span className="terminal-dot red" />
+                    <span className="terminal-dot yellow" />
+                    <span className="terminal-dot green" />
+                    <span className="terminal-title">
+                      <Terminal size={11} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} />
+                      profile.ts
                     </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  </a>
-                  <a
-                    href="#contact"
-                    className="px-8 py-4 bg-white/5 backdrop-blur-xl border-2 border-cyan-500/30 rounded-lg hover:border-cyan-400 hover:bg-white/10 transition-all duration-300 flex items-center gap-2"
-                  >
-                    Contact Me
-                    <Send className="w-5 h-5" />
-                  </a>
-                </div>
-
-                {/* Quick Stats */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-3 bg-white/5 backdrop-blur-xl border border-cyan-500/20 rounded-lg">
-                    <div className="text-2xl font-mono text-cyan-400">15+</div>
-                    <div className="text-xs text-gray-400">Projects</div>
                   </div>
-                  <div className="text-center p-3 bg-white/5 backdrop-blur-xl border border-purple-500/20 rounded-lg">
-                    <div className="text-2xl font-mono text-purple-400">3</div>
-                    <div className="text-xs text-gray-400">Hackathons</div>
-                  </div>
-                  <div className="text-center p-3 bg-white/5 backdrop-blur-xl border border-pink-500/20 rounded-lg">
-                    <div className="text-2xl font-mono text-pink-400">5+</div>
-                    <div className="text-xs text-gray-400">Certifications</div>
+                  <div className="terminal-body">
+                    <div><span className="comment">// whoami</span></div>
+                    <div><span className="prompt">const</span> name <span className="prompt">=</span> <span className="string">"Shubh Singhal"</span>;</div>
+                    <div><span className="prompt">const</span> role <span className="prompt">=</span> <span className="string">"AI/ML & IoT Engineer"</span>;</div>
+                    <div><span className="prompt">const</span> focus <span className="prompt">=</span> <span className="value">[</span></div>
+                    <div>&nbsp;&nbsp;<span className="string">"Edge AI"</span>,</div>
+                    <div>&nbsp;&nbsp;<span className="string">"Autonomous Systems"</span>,</div>
+                    <div>&nbsp;&nbsp;<span className="string">"Computer Vision"</span></div>
+                    <div><span className="value">]</span>;</div>
+                    <div><span className="prompt">const</span> status <span className="prompt">=</span> <span className="string">"Open to work"</span>;</div>
                   </div>
                 </div>
-              </div>
-
-              {/* Right Content - Tech Orbit */}
-              <div className="hidden lg:block">
-                <TechOrbit />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Stats Section */}
-        <section className="py-20 px-6">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <StatsCard icon={Code2} value={10000} suffix="+" label="Lines of Code" />
-              <StatsCard icon={Zap} value={25} suffix="+" label="IoT Devices Built" />
-              <StatsCard icon={Brain} value={12} suffix="+" label="ML Models Trained" />
-              <StatsCard icon={Trophy} value={8} suffix="+" label="Awards Won" />
-            </div>
-          </div>
-        </section>
-
-        {/* About Section */}
-        <section id="about" className="py-20 px-6">
-          <div className="max-w-6xl mx-auto">
-            {/* Section Header */}
-            <div className="mb-16">
-              <div className="flex items-center gap-3 mb-4">
-                <Terminal className="w-8 h-8 text-cyan-400" />
-                <h2 className="text-4xl md:text-5xl">
-                  <span className="text-gray-400 font-mono">01.</span>{" "}
-                  <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                    About Me
-                  </span>
-                </h2>
-                <div className="flex-1 h-px bg-gradient-to-r from-cyan-500/50 to-transparent"></div>
-              </div>
+              </motion.div>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-8">
-              {/* Left Card */}
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
-                <div className="relative bg-[#0f0f23]/80 backdrop-blur-xl border border-cyan-500/30 rounded-2xl p-8 hover:border-cyan-400 transition-all duration-300">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 bg-gradient-to-br from-cyan-500/20 to-purple-600/20 rounded-xl border border-cyan-500/30">
-                      <BookOpen className="w-6 h-6 text-cyan-400" />
-                    </div>
-                    <h3 className="text-2xl text-white">Education</h3>
-                  </div>
+            {/* Stats */}
+            <motion.div
+              className="stats-grid"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              variants={staggerContainer}
+            >
+              {stats.map((stat) => (
+                <motion.article key={stat.label} className="stat-card" variants={staggerChild}>
+                  <h3>{stat.value}</h3>
+                  <p>{stat.label}</p>
+                </motion.article>
+              ))}
+            </motion.div>
+          </section>
 
-                  <div className="space-y-4">
-                    <div className="flex gap-3">
-                      <div className="flex flex-col items-center">
-                        <div className="w-3 h-3 bg-cyan-400 rounded-full"></div>
-                        <div className="w-px h-full bg-gradient-to-b from-cyan-500 to-transparent"></div>
-                      </div>
-                      <div className="flex-1 pb-6">
-                        <div className="text-cyan-400 font-semibold mb-1">B.Tech Computer Science & Engineering</div>
-                        <div className="text-gray-400 text-sm mb-2">Specialization: AI/ML & IoT</div>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <Activity className="w-3 h-3" />
-                          <span>3rd Year • Expected 2026</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 pt-4 border-t border-cyan-500/20">
-                      <div className="text-center p-3 bg-cyan-500/10 rounded-lg">
-                        <div className="text-xl text-cyan-400 font-mono">8.7</div>
-                        <div className="text-xs text-gray-400">CGPA</div>
-                      </div>
-                      <div className="text-center p-3 bg-purple-500/10 rounded-lg">
-                        <div className="text-xl text-purple-400 font-mono">Top 5%</div>
-                        <div className="text-xs text-gray-400">Class Rank</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Card */}
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
-                <div className="relative bg-[#0f0f23]/80 backdrop-blur-xl border border-purple-500/30 rounded-2xl p-8 hover:border-purple-400 transition-all duration-300">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 bg-gradient-to-br from-purple-500/20 to-pink-600/20 rounded-xl border border-purple-500/30">
-                      <Target className="w-6 h-6 text-purple-400" />
-                    </div>
-                    <h3 className="text-2xl text-white">Goals & Interests</h3>
-                  </div>
-
-                  <div className="space-y-3">
-                    {[
-                      "Smart IoT systems & edge computing",
-                      "Deep learning & computer vision",
-                      "Robotics & autonomous systems",
-                      "Building scalable AI applications",
-                      "Research in Industry 4.0",
-                      "Contributing to open-source projects"
-                    ].map((goal, index) => (
-                      <div key={index} className="flex items-start gap-3 group/item">
-                        <ChevronRight className="w-5 h-5 text-purple-400 mt-0.5 group-hover/item:translate-x-1 transition-transform" />
-                        <span className="text-gray-300 text-sm">{goal}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bio */}
-            <div className="mt-8 relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-600 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
-              <div className="relative bg-[#0f0f23]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
-                <p className="text-gray-300 leading-relaxed">
-                  I'm a passionate developer dedicated to creating innovative solutions at the intersection of AI, ML, and IoT.
-                  My journey involves building intelligent systems that solve real-world problems, from smart home automation
-                  to predictive analytics. I'm constantly exploring new technologies and looking forward to contributing to
-                  cutting-edge projects in the tech industry. Currently seeking opportunities in AI/IoT startups and research labs.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Skills Section */}
-        <section id="skills" className="py-20 px-6">
-          <div className="max-w-6xl mx-auto">
-            {/* Section Header */}
-            <div className="mb-16">
-              <div className="flex items-center gap-3 mb-4">
-                <Layers className="w-8 h-8 text-cyan-400" />
-                <h2 className="text-4xl md:text-5xl">
-                  <span className="text-gray-400 font-mono">02.</span>{" "}
-                  <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                    Skills & Technologies
-                  </span>
-                </h2>
-                <div className="flex-1 h-px bg-gradient-to-r from-cyan-500/50 to-transparent"></div>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <SkillCategory title="IoT & Hardware" skills={iotSkills} />
-              <SkillCategory title="AI & Machine Learning" skills={aimlSkills} />
-              <SkillCategory title="Programming & Tools" skills={programmingSkills} />
-            </div>
-          </div>
-        </section>
-
-        {/* Projects Section */}
-        <section id="projects" className="py-20 px-6">
-          <div className="max-w-6xl mx-auto">
-            {/* Section Header */}
-            <div className="mb-16">
-              <div className="flex items-center gap-3 mb-4">
-                <Rocket className="w-8 h-8 text-cyan-400" />
-                <h2 className="text-4xl md:text-5xl">
-                  <span className="text-gray-400 font-mono">03.</span>{" "}
-                  <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                    Featured Projects
-                  </span>
-                </h2>
-                <div className="flex-1 h-px bg-gradient-to-r from-cyan-500/50 to-transparent"></div>
-              </div>
-              <p className="text-gray-400 text-lg">Innovative solutions leveraging IoT and AI/ML technologies</p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((project, index) => (
-                <ProjectCard key={index} {...project} />
+          {/* ── Tech Ticker ── */}
+          <section className="tech-ticker">
+            <div className="ticker-track">
+              {tickerItems.map((item, i) => (
+                <span key={i}>{item}</span>
               ))}
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Experience Section */}
-        <section id="experience" className="py-20 px-6">
-          <div className="max-w-4xl mx-auto">
-            {/* Section Header */}
-            <div className="mb-16">
-              <div className="flex items-center gap-3 mb-4">
-                <Trophy className="w-8 h-8 text-cyan-400" />
-                <h2 className="text-4xl md:text-5xl">
-                  <span className="text-gray-400 font-mono">04.</span>{" "}
-                  <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                    Experience & Achievements
-                  </span>
-                </h2>
-                <div className="flex-1 h-px bg-gradient-to-r from-cyan-500/50 to-transparent"></div>
+          {/* ── About ── */}
+          <motion.section
+            id="about"
+            className="container-section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeUp}
+            custom={0}
+          >
+            <p className="section-label">ABOUT</p>
+            <h2 className="section-title">Engineering systems that think, sense, and act.</h2>
+            <p className="section-subtitle">
+              I'm a multi-disciplinary engineer at the intersection of AI and embedded systems.
+              Whether architecting perception pipelines or deploying edge compute, I build
+              systems that transcend the gap between prototype and production.
+            </p>
+
+            <motion.div
+              className="pillars-grid"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              variants={staggerContainer}
+            >
+              {pillars.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <motion.article key={item.title} className="pillar-card" variants={staggerChild}>
+                    <div className="pillar-icon">
+                      <Icon size={18} />
+                    </div>
+                    <h3>{item.title}</h3>
+                    <p>{item.text}</p>
+                  </motion.article>
+                );
+              })}
+            </motion.div>
+          </motion.section>
+
+          {/* ── Skills ── */}
+          <motion.section
+            id="skills"
+            className="container-section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeUp}
+            custom={0}
+          >
+            <p className="section-label">SKILLS</p>
+            <h2 className="section-title">Technologies and strengths I bring to every build.</h2>
+
+            {/* Technical Skills */}
+            <motion.div
+              className="skills-grid"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+              variants={staggerContainer}
+            >
+              {technicalSkillGroups.map((group) => {
+                const Icon = group.icon;
+                return (
+                  <motion.div
+                    key={group.category}
+                    className="skill-group"
+                    variants={staggerChild}
+                    style={{ "--skill-accent": group.accent } as React.CSSProperties}
+                  >
+                    <div className="skill-group-header">
+                      <div className="skill-group-icon">
+                        <Icon size={16} />
+                      </div>
+                      <h3>{group.category}</h3>
+                    </div>
+                    <div className="skill-chips">
+                      {group.skills.map((skill) => (
+                        <span key={skill} className="skill-chip">{skill}</span>
+                      ))}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+
+            {/* Soft Skills */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+              variants={staggerContainer}
+            >
+              <p className="soft-skills-label">Soft Skills</p>
+              <div className="soft-skills-row">
+                {softSkills.map((s) => {
+                  const Icon = s.icon;
+                  return (
+                    <motion.span key={s.label} className="soft-chip" variants={staggerChild}>
+                      <Icon size={13} /> {s.label}
+                    </motion.span>
+                  );
+                })}
               </div>
-            </div>
+            </motion.div>
+          </motion.section>
 
-            <div className="space-y-0">
-              <ExperienceCard
-                title="President - CSED CLUB"
-                organization="GLA University"
-                period="May 2025 - Present"
-                description="Leading the CSED Club to foster innovation and technical excellence. Overseeing all club initiatives, mentoring independent teams, and driving strategic growth for the student community."
-                icon={<Trophy className="w-4 h-4 text-white" />}
-              />
+          {/* ── Projects ── */}
+          <motion.section
+            id="projects"
+            className="container-section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeUp}
+            custom={0}
+          >
+            <p className="section-label">PROJECTS</p>
+            <h2 className="section-title">Signature builds that demonstrate engineering excellence.</h2>
 
-              <ExperienceCard
-                title="General Secretary - CSED CLUB"
-                organization="GLA University"
-                period="December 2024 - May 2025"
-                description="Spearheaded technical initiatives, organizing workshops, seminars, and hackathons to promote innovation in AI, IoT, and software development. Mentored junior students on project development, Git practices, and technical career-building."
-                icon={<Users className="w-4 h-4 text-white" />}
-              />
-
-              <ExperienceCard
-                title="Winner - Tech-Expo 2024"
-                organization="Project SARV"
-                period="2024"
-                description="Won the Tech-Expo 2024 for developing Project SARV. Recognized with Best Innovation Award for the external ADAS Kit project demonstration showcasing advanced driver assistance capabilities."
-                icon={<Trophy className="w-4 h-4 text-white" />}
-              />
-
-              <ExperienceCard
-                title="Selected - Google Dev House Hackathon"
-                organization="VIT Chennai"
-                period="2025"
-                description="Selected for the prestigious Google Dev House Hackathon 2025 held at VIT Chennai. Competing among top developers nationwide to build innovative solutions."
-                icon={<Sparkles className="w-4 h-4 text-white" />}
-              />
-
-              <ExperienceCard
-                title="Workshop Organizer & Mentor"
-                organization="GLA University"
-                period="2024 - 2025"
-                description="Organized and mentored a university-wide AI-IoT Workshop attended by 150+ participants. Conducted online IIoT Workshop with 200+ participants, sharing expertise in embedded systems and IoT."
-                icon={<Award className="w-4 h-4 text-white" />}
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Contact Section */}
-        <section id="contact" className="py-20 px-6">
-          <div className="max-w-4xl mx-auto">
-            {/* Section Header */}
-            <div className="mb-16">
-              <div className="flex items-center gap-3 mb-4">
-                <Send className="w-8 h-8 text-cyan-400" />
-                <h2 className="text-4xl md:text-5xl">
-                  <span className="text-gray-400 font-mono">05.</span>{" "}
-                  <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                    Get In Touch
-                  </span>
-                </h2>
-                <div className="flex-1 h-px bg-gradient-to-r from-cyan-500/50 to-transparent"></div>
-              </div>
-              <p className="text-gray-400 text-lg">Let's collaborate on exciting projects!</p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Contact Form */}
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
-                <div className="relative bg-[#0f0f23]/80 backdrop-blur-xl border border-cyan-500/30 rounded-2xl p-8">
-                  <h3 className="text-2xl mb-6 flex items-center gap-2">
-                    <Terminal className="w-6 h-6 text-cyan-400" />
-                    Send Message
-                  </h3>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                      <label className="block text-sm text-gray-400 mb-2 font-mono">{'> '}Name</label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-4 py-3 bg-black/50 border border-cyan-500/30 rounded-lg focus:border-cyan-400 focus:outline-none transition-colors text-white font-mono"
-                        placeholder="Your name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-400 mb-2 font-mono">{'> '}Email</label>
-                      <input
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-4 py-3 bg-black/50 border border-cyan-500/30 rounded-lg focus:border-cyan-400 focus:outline-none transition-colors text-white font-mono"
-                        placeholder="your.email@example.com"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-gray-400 mb-2 font-mono">{'> '}Message</label>
-                      <textarea
-                        required
-                        value={formData.message}
-                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                        rows={4}
-                        className="w-full px-4 py-3 bg-black/50 border border-cyan-500/30 rounded-lg focus:border-cyan-400 focus:outline-none transition-colors resize-none text-white font-mono"
-                        placeholder="Your message..."
-                      />
-                    </div>
+            {/* Domain Filter Tabs */}
+            <div className="domain-filter">
+              <span className="domain-prompt">~/projects $</span>
+              <div className="domain-tabs">
+                {domains.map((d) => {
+                  const Icon = d.icon;
+                  const isActive = activeDomain === d.key;
+                  return (
                     <button
-                      type="submit"
-                      className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] transition-all duration-300 flex items-center justify-center gap-2 group/btn"
+                      key={d.key}
+                      className={`domain-tab ${isActive ? "active" : ""}`}
+                      onClick={() => setActiveDomain(d.key)}
+                      style={{ "--tab-accent": d.accent } as React.CSSProperties}
                     >
-                      Send Message
-                      <Send className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                      <Icon size={13} />
+                      <span className="domain-dir">{d.dir}</span>
+                      <span className="domain-label">{d.label}</span>
                     </button>
-                  </form>
-                </div>
+                  );
+                })}
               </div>
+              <div className="domain-result-count">
+                <span className="domain-prompt">→</span> {filteredProjects.length} result{filteredProjects.length !== 1 ? "s" : ""} found
+              </div>
+            </div>
 
-              {/* Contact Info */}
-              <div className="space-y-6">
-                <div className="relative group">
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
-                  <div className="relative bg-[#0f0f23]/80 backdrop-blur-xl border border-purple-500/30 rounded-2xl p-8">
-                    <h3 className="text-2xl mb-6 flex items-center gap-2">
-                      <Sparkles className="w-6 h-6 text-purple-400" />
-                      Connect
-                    </h3>
-                    <div className="space-y-4">
-                      <a
-                        href="mailto:shubhsinghal.work@gmail.com"
-                        className="flex items-center gap-4 p-4 bg-black/30 border border-cyan-500/20 rounded-lg hover:border-cyan-400 hover:bg-black/50 transition-all group/link"
+            {/* Filtered project cards with layout animation */}
+            <motion.div className="projects-list" layout>
+              <AnimatePresence mode="popLayout">
+                {filteredProjects.map((project, index) => (
+                  <motion.article
+                    key={project.title}
+                    className="project-card"
+                    layout
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  >
+                    <div className="project-card-header">
+                      <span className="project-number">0{index + 1}</span>
+                      <span
+                        className="project-domain-badge"
+                        style={{ "--badge-accent": domains.find((d) => d.key === project.domain)?.accent } as React.CSSProperties}
                       >
-                        <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-lg flex items-center justify-center group-hover/link:scale-110 transition-transform">
-                          <Mail className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-400 font-mono">EMAIL</p>
-                          <p className="text-white group-hover/link:text-cyan-400 transition-colors font-mono text-sm">shubhsinghal.work@gmail.com</p>
-                        </div>
-                      </a>
-
-                      <a
-                        href="https://linkedin.com/in/shubh-singhal-"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-4 p-4 bg-black/30 border border-purple-500/20 rounded-lg hover:border-purple-400 hover:bg-black/50 transition-all group/link"
-                      >
-                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center group-hover/link:scale-110 transition-transform">
-                          <Linkedin className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-400 font-mono">LINKEDIN</p>
-                          <p className="text-white group-hover/link:text-purple-400 transition-colors font-mono text-sm">/in/shubh-singhal-</p>
-                        </div>
-                      </a>
-
-                      <a
-                        href="tel:+918938063307"
-                        className="flex items-center gap-4 p-4 bg-black/30 border border-pink-500/20 rounded-lg hover:border-pink-400 hover:bg-black/50 transition-all group/link"
-                      >
-                        <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-cyan-600 rounded-lg flex items-center justify-center group-hover/link:scale-110 transition-transform">
-                          <Smartphone className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-400 font-mono">PHONE</p>
-                          <p className="text-white group-hover/link:text-pink-400 transition-colors font-mono text-sm">+91 8938063307</p>
-                        </div>
-                      </a>
+                        {domains.find((d) => d.key === project.domain)?.label}
+                      </span>
                     </div>
-                  </div>
-                </div>
+                    <h3>{project.title}</h3>
+                    <p className="project-summary">{project.summary}</p>
+                    <p className="project-impact">{project.impact}</p>
+                    <div className="tag-row">
+                      {project.tags.map((tag) => (
+                        <span key={tag} className="chip">{tag}</span>
+                      ))}
+                    </div>
+                    <a href="#contact" className="project-link">
+                      Discuss this build <ChevronRight size={15} />
+                    </a>
+                  </motion.article>
+                ))}
+              </AnimatePresence>
+            </motion.div>
 
-                <div className="relative group">
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-2xl blur-xl opacity-20"></div>
-                  <div className="relative bg-gradient-to-br from-cyan-500/10 to-purple-600/10 border border-cyan-500/30 rounded-2xl p-6 text-center">
-                    <Zap className="w-12 h-12 mx-auto mb-3 text-cyan-400" />
-                    <p className="text-gray-300 text-sm leading-relaxed">
-                      Open to <span className="text-cyan-400 font-semibold">internships</span>, <span className="text-purple-400 font-semibold">collaborations</span>, and exciting project opportunities in AI/ML and IoT!
-                    </p>
-                  </div>
-                </div>
+            {/* Empty state */}
+            {filteredProjects.length === 0 && (
+              <motion.div
+                className="projects-empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <p className="empty-text">
+                  <span className="domain-prompt">$</span> ls {activeDomainData.dir}
+                </p>
+                <p className="empty-sub">No projects in this directory yet. Check back soon.</p>
+              </motion.div>
+            )}
+          </motion.section>
+
+          {/* ── Experience ── */}
+          <motion.section
+            id="experience"
+            className="container-section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeUp}
+            custom={0}
+          >
+            <p className="section-label">EXPERIENCE</p>
+            <h2 className="section-title">Leadership and impact across technical ecosystems.</h2>
+
+            <motion.div
+              className="timeline-wrap"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+              variants={staggerContainer}
+            >
+              {timeline.map((item) => (
+                <motion.article key={item.role} className="timeline-item" variants={staggerChild}>
+                  <p className="timeline-period">{item.period}</p>
+                  <h3>{item.role}</h3>
+                  <p>{item.detail}</p>
+                </motion.article>
+              ))}
+            </motion.div>
+          </motion.section>
+
+          {/* ── Contact ── */}
+          <motion.section
+            id="contact"
+            className="container-section contact-grid"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeUp}
+            custom={0}
+          >
+            <div>
+              <p className="section-label">CONTACT</p>
+              <h2 className="section-title">Ready to build something extraordinary?</h2>
+              <p className="contact-copy">
+                I'm open to internships, full-time roles, and ambitious collaborations where
+                applied AI and IoT can create measurable impact.
+              </p>
+              <div className="contact-links">
+                <a href="mailto:shubhsinghal.work@gmail.com">
+                  <Mail size={16} /> shubhsinghal.work@gmail.com
+                </a>
+                <a href="https://linkedin.com/in/shubh-singhal-" target="_blank" rel="noopener noreferrer">
+                  <Linkedin size={16} /> linkedin.com/in/shubh-singhal-
+                </a>
+                <a href="https://github.com/Shubh-Singhal-Taken" target="_blank" rel="noopener noreferrer">
+                  <Github size={16} /> github.com/Shubh-Singhal-Taken
+                </a>
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* Footer */}
-        <footer className="py-8 px-6 border-t border-cyan-500/20">
-          <div className="max-w-6xl mx-auto">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-mono text-gray-400">shubhsinghal.in</span>
-              </div>
-              <p className="text-gray-400 text-sm font-mono">
-                © 2026 Shubh Singhal • Built with React & Tailwind CSS
-              </p>
-              <p className="text-gray-500 text-xs font-mono">
-                {'<'}Designed for innovation, crafted with passion{' />'}
-              </p>
-            </div>
+            <form onSubmit={handleSubmit} className="contact-form">
+              <h3>Send a Message</h3>
+              <input
+                required
+                type="text"
+                placeholder="Your name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              />
+              <input
+                required
+                type="email"
+                placeholder="Your email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              />
+              <textarea
+                required
+                rows={5}
+                placeholder="Tell me about your project..."
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+              />
+              <button type="submit" className="btn-solid">
+                Send Message <Send size={15} />
+              </button>
+            </form>
+          </motion.section>
+        </main>
+
+        {/* ── Footer ── */}
+        <footer className="site-footer container-grid">
+          <p>© 2025 Shubh Singhal — Designed & built with precision.</p>
+          <div className="footer-links">
+            <a href="https://github.com/Shubh-Singhal-Taken" target="_blank" rel="noopener noreferrer">
+              <Github size={16} />
+            </a>
+            <a href="https://linkedin.com/in/shubh-singhal-" target="_blank" rel="noopener noreferrer">
+              <Linkedin size={16} />
+            </a>
+            <a href="mailto:shubhsinghal.work@gmail.com">
+              <Mail size={16} />
+            </a>
           </div>
         </footer>
       </div>
-    </div>
+    </>
   );
 }

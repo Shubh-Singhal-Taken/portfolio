@@ -1,21 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+/* Fonts loaded via <link> in index.html (Fontshare + Google) to avoid
+   render-blocking @import. Stacks degrade gracefully if a CDN is slow. */
 
 :root {
-  --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
-  --font-heading: 'Space Grotesk', 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-display: 'Clash Display', 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'General Sans', 'Outfit', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 }
 
-body {
-  font-family: var(--font-body);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.font-heading {
-  font-family: var(--font-heading);
-}
-
-.font-mono {
-  font-family: var(--font-mono);
-}
+.font-display { font-family: var(--font-display); }
+.font-body { font-family: var(--font-body); }
+.font-mono { font-family: var(--font-mono); }

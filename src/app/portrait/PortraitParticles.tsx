@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { samplePortrait } from "./sampleImage";
+import { EYE, HAIR, loadHeadCloud, type HeadCloud } from "./headCloud";
 
 /* The star portrait, as particles.
 
    Stars drift in from across the viewport and settle into the portrait
    inside the element marked [data-portrait-hero]. Scrolling toward the
    element marked [data-portrait-head] carries them across into a
-   sculpted 3D head that turns slowly and leans toward the cursor;
-   scrolling past it scatters them back into the star field.
+   sculpted 3D head (baked by scripts/sculpt-head.mts) that turns to look
+   at the cursor; scrolling past it scatters them back into the stars.
 
    Both targets are measured from the live layout every frame, so the
    effect follows the page at any width instead of assuming where the
@@ -18,18 +19,23 @@ import { samplePortrait } from "./sampleImage";
 type Props = { ready: boolean };
 
 const PORTRAIT_SRC = "/portrait.png";
+const HEAD_SRC = "/head-cloud.bin";
 const BUCKETS = 10;
 const FILLS = Array.from(
   { length: BUCKETS },
   (_, i) => `rgba(255, 255, 255, ${((i + 1) / BUCKETS).toFixed(2)})`
 );
 
-/* Bust extents from headSculpt.ts */
-const BUST_TOP = 1.06;
+/* Bust extents from headSculpt.ts: hair crown to the neck cut */
+const BUST_TOP = 1.12;
 const BUST_BOTTOM = -1.5;
 const BUST_MID = (BUST_TOP + BUST_BOTTOM) / 2;
-const BUST_HALF_WIDTH = 0.85;
+const BUST_HALF_WIDTH = 0.88;
 const CAMERA_DISTANCE = 6;
+
+/* With no cursor to look at, the head faces the About panel. */
+const REST_YAW = 0.3;
+const REST_PITCH = -0.04;
 
 /* The formation plays once per visit; later mounts start fully formed. */
 let formedThisVisit = false;
@@ -38,13 +44,6 @@ const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 const smoothstep = (a: number, b: number, v: number) => {
   const t = clamp01((v - a) / (b - a));
   return t * t * (3 - 2 * t);
-};
-
-type Head = {
-  positions: Float32Array;
-  normals: Float32Array;
-  shade: Float32Array;
-  count: number;
 };
 
 export default function PortraitParticles({ ready }: Props) {
@@ -71,8 +70,7 @@ export default function PortraitParticles({ ready }: Props) {
     let disposed = false;
     let frame = 0;
     let running = false;
-    let worker: Worker | null = null;
-    let workerTimer = 0;
+    let headTimer = 0;
 
     /* ---------------- canvas size ---------------- */
 
@@ -90,12 +88,15 @@ export default function PortraitParticles({ ready }: Props) {
 
     /* ---------------- pointer ---------------- */
 
-    const pointer = { x: 0, y: 0, ex: 0, ey: 0, active: false };
+    const pointer = { x: 0, y: 0, ex: 0, ey: 0, clientX: 0, clientY: 0, active: false };
     const onPointerMove = (e: PointerEvent) => {
       pointer.x = e.clientX / vw - 0.5;
       pointer.y = e.clientY / vh - 0.5;
+      pointer.clientX = e.clientX;
+      pointer.clientY = e.clientY;
       pointer.active = true;
     };
+    const gaze = { yaw: REST_YAW, pitch: REST_PITCH };
     const onPointerLeave = () => {
       pointer.active = false;
     };
@@ -125,16 +126,17 @@ export default function PortraitParticles({ ready }: Props) {
     let order = new Int32Array(0);
     const bucketStart = new Int32Array(BUCKETS + 1);
 
-    let head: Head | null = null;
+    let head: HeadCloud | null = null;
     let headIndex = new Int32Array(0);
     let headX = new Float32Array(0);
     let headY = new Float32Array(0);
     let headA = new Float32Array(0);
+    let headSize = new Float32Array(0);
 
     let startTime: number | null = null;
     let cleared = true;
 
-    const pairWithHead = (h: Head) => {
+    const pairWithHead = (h: HeadCloud) => {
       // Match portrait particles to head points top-to-bottom, so the
       // crown of the portrait becomes the crown of the bust rather than
       // every star crossing the screen.
@@ -152,18 +154,23 @@ export default function PortraitParticles({ ready }: Props) {
       headX = new Float32Array(h.count);
       headY = new Float32Array(h.count);
       headA = new Float32Array(h.count);
+      // Hair dots finer than skin, so the two surfaces read as different
+      headSize = new Float32Array(h.count);
+      for (let j = 0; j < h.count; j++) {
+        headSize[j] = h.kind[j] === HAIR ? 0.6 : h.kind[j] === EYE ? 0.7 : 0.8;
+      }
       head = h;
     };
 
-    const startWorker = () => {
+    const loadHead = () => {
       if (!headEl || disposed) return;
-      worker = new Worker(new URL("./head.worker.ts", import.meta.url), { type: "module" });
-      worker.onmessage = (e: MessageEvent<Head>) => {
-        if (!disposed && e.data.count > 0) pairWithHead(e.data);
-        worker?.terminate();
-        worker = null;
-      };
-      worker.postMessage({ count });
+      loadHeadCloud(HEAD_SRC, count)
+        .then((cloud) => {
+          if (!disposed && cloud.count > 0) pairWithHead(cloud);
+        })
+        .catch(() => {
+          // No head: the portrait simply scatters on scroll instead.
+        });
     };
 
     samplePortrait(PORTRAIT_SRC, vw < 768 ? 3800 : 9500)
@@ -211,8 +218,9 @@ export default function PortraitParticles({ ready }: Props) {
             : Math.max(0.35, 0.4 + targets.brightness[i] * 0.5);
         }
 
-        // Sculpting runs off-thread; give the formation a head start
-        workerTimer = window.setTimeout(startWorker, 1200);
+        // The bust is only needed once the visitor scrolls; let the
+        // formation have the network and the main thread first.
+        headTimer = window.setTimeout(loadHead, 1200);
         if (running) schedule();
       })
       .catch(() => {
@@ -267,20 +275,30 @@ export default function PortraitParticles({ ready }: Props) {
 
       // Project the bust for this frame
       if (head && hd && morph > 0.001) {
-        // Turned toward the About panel, swaying either side of that
-        const sway = 0.32 + (reduced ? 0 : Math.sin(elapsed * 0.28) * 0.3);
-        const yaw = sway + (coarse ? 0 : pointer.ex * 0.56);
-        const pitch = -0.05 + (coarse ? 0 : pointer.ey * 0.28);
-        const cyaw = Math.cos(yaw);
-        const syaw = Math.sin(yaw);
-        const cp = Math.cos(pitch);
-        const sp = Math.sin(pitch);
         const scale = Math.min(
           (hd.height * 0.94) / (BUST_TOP - BUST_BOTTOM),
           (hd.width * 0.94) / (2 * BUST_HALF_WIDTH)
         );
         const cx = hd.left + hd.width / 2;
         const cy = hd.top + hd.height / 2;
+
+        // Look toward the cursor; with none (touch, or not moved yet),
+        // rest facing the About panel. Reduced motion holds the rest pose.
+        let targetYaw = REST_YAW;
+        let targetPitch = REST_PITCH;
+        if (pointer.active && !coarse && !reduced) {
+          targetYaw = Math.max(-0.9, Math.min(0.9, Math.atan2(pointer.clientX - cx, 700) * 1.4));
+          targetPitch = Math.max(-0.3, Math.min(0.3, Math.atan2(pointer.clientY - (cy + BUST_MID * scale), 900) * 1.1));
+        }
+        gaze.yaw += (targetYaw - gaze.yaw) * (reduced ? 1 : 0.06);
+        gaze.pitch += (targetPitch - gaze.pitch) * (reduced ? 1 : 0.06);
+        const yaw = gaze.yaw;
+        const pitch = gaze.pitch;
+
+        const cyaw = Math.cos(yaw);
+        const syaw = Math.sin(yaw);
+        const cp = Math.cos(pitch);
+        const sp = Math.sin(pitch);
         const { positions, normals, shade } = head;
 
         for (let j = 0; j < head.count; j++) {
@@ -299,7 +317,11 @@ export default function PortraitParticles({ ready }: Props) {
           const f = CAMERA_DISTANCE / (CAMERA_DISTANCE - z2);
           headX[j] = cx + x1 * scale * f;
           headY[j] = cy - (y2 - BUST_MID) * scale * f;
-          headA[j] = (0.3 + 0.7 * shade[j]) * smoothstep(-0.05, 0.35, facing);
+          // Fade out as the surface turns away, with a slight lift right at
+          // the silhouette so the outline of the head holds as it turns
+          const visible = smoothstep(-0.04, 0.12, facing);
+          const rim = 1 - smoothstep(0.12, 0.45, facing);
+          headA[j] = Math.min(1, (0.3 + 0.7 * shade[j] + 0.25 * rim) * visible);
         }
       }
 
@@ -358,7 +380,7 @@ export default function PortraitParticles({ ready }: Props) {
         a *= fade;
         outX[i] = x;
         outY[i] = y;
-        outR[i] = useHead && !crossfade ? size[i] + (0.75 - size[i]) * morph : size[i];
+        outR[i] = useHead && !crossfade ? size[i] + (headSize[headIndex[i]] - size[i]) * morph : size[i];
         outBucket[i] = a <= 0.01 ? -1 : Math.min(BUCKETS - 1, Math.floor(a * BUCKETS));
       }
 
@@ -465,8 +487,7 @@ export default function PortraitParticles({ ready }: Props) {
       disposed = true;
       running = false;
       if (frame) cancelAnimationFrame(frame);
-      window.clearTimeout(workerTimer);
-      worker?.terminate();
+      window.clearTimeout(headTimer);
       observer.disconnect();
       window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onPointerMove);

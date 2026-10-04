@@ -1,0 +1,512 @@
+/* ============================================================
+   CHROME — loader, cursor, nav, dot-nav, sound, language, game
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   LOADING SCREEN
+   ------------------------------------------------------------ */
+
+#loading-screen {
+  position: fixed;
+  inset: -5vh -0.5vw;
+  width: 110vw;
+  height: 110vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  font-style: italic;
+  opacity: 1;
+  z-index: var(--z-nav-loader);
+  transition: opacity 1.6s ease;
+}
+
+#loading-screen.is-done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#loader {
+  position: relative;
+  display: block;
+  width: 10vw;
+  height: 10vw;
+  min-width: 150px;
+  min-height: 150px;
+  max-width: 400px;
+  max-height: 400px;
+  border: 1px solid transparent;
+  border-top-color: #888;
+  border-radius: 50%;
+  animation: spin 3s linear infinite;
+}
+
+#loader::after {
+  content: "";
+  position: absolute;
+  inset: 15px;
+  border: 1px solid transparent;
+  border-top-color: #888;
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite;
+}
+
+#loader-text {
+  position: absolute;
+  color: #9a9a9a;
+  font-size: 2.1vw;
+  font-weight: lighter;
+  letter-spacing: 0.9vw;
+  text-align: center;
+  white-space: nowrap;
+  transform: translateY(-1.5vw);
+}
+
+.loader-counter {
+  position: absolute;
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 1.25vw;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0.25vw;
+  text-align: center;
+  text-decoration: underline;
+  transform: translateY(4vw);
+}
+
+@media (max-width: 760px) {
+  #loader {
+    width: 150px;
+    height: 150px;
+  }
+  #loader-text {
+    font-size: 1.05rem;
+    letter-spacing: 0.45rem;
+    transform: translateY(-1.5rem);
+  }
+  .loader-counter {
+    font-size: 0.95rem;
+    letter-spacing: 0.25rem;
+    transform: translateY(3.5rem);
+  }
+}
+
+/* ------------------------------------------------------------
+   RING CURSOR
+   ------------------------------------------------------------ */
+
+.circle {
+  position: fixed;
+  left: 50%;
+  top: 25%;
+  width: 1vw;
+  height: 1vw;
+  min-width: 15px;
+  min-height: 15px;
+  border: solid 1px #ccc;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: var(--z-cursor);
+  /* Scale rather than resize: the ring is a fixed-position element that
+     tracks the pointer every frame, so layout must never be involved. */
+  transform: scale(1);
+  transition: top 0s, left 0s, transform 0.25s ease, border-color 0.25s ease,
+    opacity 0.4s ease;
+}
+
+.circle.is-hot {
+  transform: scale(2.2);
+  border-color: var(--accent);
+}
+
+.circle-inner {
+  position: fixed;
+  width: 1vw;
+  height: 1vw;
+  min-width: 15px;
+  min-height: 15px;
+  background: #a6a6a6;
+  opacity: 0.5;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: var(--z-cursor);
+  transition: top 0s, left 0s, opacity 0.6s ease;
+  animation: pulse 1.5s ease-out infinite;
+}
+
+.circle-label {
+  position: fixed;
+  color: var(--t-3);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: var(--z-cursor);
+  transform: translate(-50%, 1.6rem);
+  transition: opacity 0.6s ease;
+}
+
+.circle.is-hidden,
+.circle-inner.is-hidden,
+.circle-label.is-hidden {
+  opacity: 0;
+}
+
+@media (pointer: coarse) {
+  .circle,
+  .circle-inner,
+  .circle-label {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------
+   BURGER + FULLSCREEN OVERLAY NAV
+   ------------------------------------------------------------ */
+
+.mobile-menu {
+  position: fixed;
+  top: 2.5vh;
+  right: max(1rem, 3vw);
+  display: grid;
+  gap: 5px;
+  padding: 6px;
+  cursor: pointer;
+  z-index: var(--z-nav-loader);
+}
+
+.mobile-menu div {
+  width: 26px;
+  height: 2px;
+  background: var(--t-3);
+  transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s ease;
+}
+
+.mobile-menu:hover div {
+  background: var(--t-1);
+}
+
+.mobile-menu.is-open .line1 {
+  transform: translateY(7px) rotate(45deg);
+}
+.mobile-menu.is-open .line2 {
+  opacity: 0;
+}
+.mobile-menu.is-open .line3 {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* The reference wraps this column, but it carries five links; with seven
+   plus a social row the wrap spills into a broken second column, so this
+   stays a single centred stack. */
+.nav-list {
+  position: fixed;
+  top: -9vh;
+  left: 0;
+  width: 100vw;
+  height: 110vh;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  font-style: italic;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: transform 0.4s ease-in, opacity 1s;
+  z-index: var(--z-overlay);
+}
+
+.nav-list.is-active {
+  transform: translateX(0);
+}
+
+.nav-list.is-visible {
+  opacity: 0.96;
+}
+
+.nav-list li {
+  margin: clamp(0.35rem, 1.1vh, 0.9rem);
+  color: var(--t-3);
+  font-weight: 100;
+  font-size: clamp(1.15rem, 2.4vh, 2rem);
+  letter-spacing: 3px;
+  text-align: center;
+  text-transform: uppercase;
+  opacity: 0;
+}
+
+.nav-list.is-active li {
+  animation: navLinkFade 0.5s ease forwards;
+}
+
+.nav-list li a {
+  color: #cecece;
+  transition: color 0.3s ease, letter-spacing 0.3s ease;
+}
+
+.nav-list li a:hover,
+.nav-list li a.is-current {
+  color: var(--t-1);
+  letter-spacing: 5px;
+}
+
+.nav-social {
+  display: flex;
+  gap: 1.75rem;
+  margin-top: clamp(1rem, 3vh, 2.5rem);
+  opacity: 0;
+}
+
+.nav-list.is-active .nav-social {
+  animation: navLinkFade 0.5s ease forwards;
+  animation-delay: 0.55s;
+}
+
+.nav-social a {
+  color: var(--t-4);
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.nav-social a:hover {
+  color: var(--accent);
+  transform: translateY(-3px);
+}
+
+@media (max-width: 760px) {
+  .nav-list li {
+    font-size: clamp(1.05rem, 2.2vh, 1.5rem);
+  }
+}
+
+/* ------------------------------------------------------------
+   RIGHT-RAIL DOT NAV
+   ------------------------------------------------------------ */
+
+.nav__dot {
+  position: fixed;
+  right: 2.5vw;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  z-index: var(--z-chrome);
+}
+
+.nav__dot li {
+  display: flex;
+}
+
+.nav__dot button {
+  position: relative;
+  width: 0.5vw;
+  height: 0.5vw;
+  min-width: 7px;
+  min-height: 7px;
+  margin: 0 0 2.6vw;
+  padding: 0;
+  background: #f5f5f521;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.7s var(--ease-nav) 0s, transform 0.3s ease;
+}
+
+.nav__dot li:last-child button {
+  margin: 0;
+}
+
+.nav__dot button:hover {
+  transform: scale(1.4);
+  background: #f5f5f566;
+}
+
+.nav__dot button[aria-current="true"] {
+  background: var(--t-2);
+}
+
+/* The hit area is generous even though the dot is tiny. */
+.nav__dot button::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 26px;
+  height: 26px;
+  transform: translate(-50%, -50%);
+}
+
+@media (max-width: 1024px) {
+  .nav__dot {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------
+   SOUND TOGGLE + VISUALIZER
+   ------------------------------------------------------------ */
+
+.speaker {
+  position: fixed;
+  left: 2%;
+  top: 2.75%;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--t-4);
+  z-index: var(--z-chrome);
+  transition: color 0.3s ease;
+}
+
+.speaker:hover {
+  color: var(--t-2);
+}
+
+.bar-c {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 18px;
+}
+
+/* Bars are full height and squashed with scaleY, so the 12fps analyser
+   loop never touches layout. --level is written by the audio hook. */
+.bar {
+  width: 2px;
+  height: 18px;
+  background: var(--t-4);
+  border-radius: 1px;
+  transform-origin: bottom;
+  transform: scaleY(var(--level, 0.16));
+  transition: transform 0.08s linear, background 0.3s ease;
+}
+
+.speaker.is-playing .bar {
+  background: var(--accent);
+}
+
+.speaker.is-muted .bar {
+  transform: scaleY(0.16);
+}
+
+.music-credits {
+  position: fixed;
+  left: 2%;
+  bottom: 1.5rem;
+  max-width: 22ch;
+  color: var(--t-6);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  z-index: var(--z-chrome);
+}
+
+.music-credits a {
+  border-bottom: 1px solid var(--t-6);
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.music-credits a:hover {
+  color: var(--t-3);
+  border-color: var(--t-3);
+}
+
+@media (max-width: 760px) {
+  .music-credits {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------
+   LANGUAGE DROPDOWN
+   ------------------------------------------------------------ */
+
+ /* Sits one burger-width in from the menu button at every viewport;
+    a bare vw offset collides with it on a phone. */
+.dropdown {
+  position: fixed;
+  top: 2.5vh;
+  right: calc(max(1rem, 3vw) + 4rem);
+  z-index: var(--z-nav-loader);
+}
+
+.dropdown__button {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 5vh;
+  min-height: 30px;
+  padding: 0 0.7vw;
+  color: #fff;
+  font-size: max(0.8vw, 11px);
+  font-weight: 200;
+  background: transparent;
+  border: solid 1px var(--line);
+  border-radius: 0.5rem;
+  transition: background 0.3s ease;
+}
+
+.dropdown__button:hover {
+  background: var(--line);
+}
+
+.dropdown__items {
+  position: absolute;
+  right: 0;
+  margin-top: 0.4rem;
+  display: grid;
+  overflow: hidden;
+  background: var(--panel-2);
+  border: solid 1px var(--line);
+  border-radius: 0.5rem;
+}
+
+.dropdown__items.dropdown--hide {
+  display: none;
+}
+
+.dropdown__item {
+  padding: 0.5rem 1.1rem;
+  color: var(--t-3);
+  font-size: max(0.75vw, 11px);
+  text-align: left;
+  white-space: nowrap;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.dropdown__item:hover,
+.dropdown__item[aria-selected="true"] {
+  background: var(--line);
+  color: #fff;
+}
+
+/* ------------------------------------------------------------
+   GAME BUTTON
+   ------------------------------------------------------------ */
+
+.game-button {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  padding: 0;
+  color: var(--accent);
+  opacity: 0.6;
+  transform: scale(0.8);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: var(--z-chrome);
+}
+
+.game-button:hover,
+.game-button:focus-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (max-width: 760px) {
+  .game-button,
+  .music-credits {
+    display: none;
+  }
+}

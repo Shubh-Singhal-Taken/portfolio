@@ -1,0 +1,378 @@
+/* ============================================================
+   RESET, BASE, SHARED PRIMITIVES, KEYFRAMES
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--dark-bg);
+  color: var(--t-2);
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scroll lock used by the loader, the overlay nav and the game.
+   Kept as a class so nothing races the CSS cascade. */
+body.no-scroll {
+  overflow-y: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  font-family: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+ul,
+ol {
+  list-style: none;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--dark-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 999;
+  padding: 0.75rem 1.25rem;
+  background: var(--panel);
+  color: var(--t-1);
+  font-size: 0.85rem;
+}
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================
+   THE FIXED WEBGL CANVAS
+   ============================================================ */
+
+#main-content {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-canvas);
+  transition: opacity 1s ease;
+  pointer-events: none;
+}
+
+/* ============================================================
+   SCROLL SHELL & SECTIONS
+   ============================================================ */
+
+.shell {
+  position: relative;
+  z-index: var(--z-content);
+}
+
+.section {
+  position: relative;
+  background: transparent;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  margin-bottom: var(--spacing);
+  padding-inline: 6vw;
+}
+
+.section:first-of-type {
+  margin-bottom: calc(var(--spacing) * 0.6);
+}
+
+.section-panel {
+  background: var(--panel);
+  border-radius: 12px;
+  padding: clamp(1.5rem, 3vw, 3rem);
+}
+
+/* The underlined grey heading rule used by every section. */
+.section-title {
+  display: inline-block;
+  width: auto;
+  min-width: 10%;
+  padding-top: 1%;
+  padding-left: 1%;
+  padding-right: 2%;
+  background: transparent;
+  color: var(--t-5);
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: clamp(20px, 1.8vw, 2.6rem);
+  letter-spacing: 0.3vw;
+  text-transform: capitalize;
+  border-bottom: 0.2vw solid var(--t-5);
+}
+
+@media (max-width: 760px) {
+  .section-title {
+    font-size: 1.2em;
+    letter-spacing: 0.2vw;
+    border-bottom-width: 2px;
+  }
+}
+
+.section-lead {
+  margin-top: 1.5rem;
+  color: var(--t-2);
+  font-size: clamp(15px, 1.1vw, 1.15rem);
+  font-weight: 400;
+  line-height: 1.75;
+  max-width: 70ch;
+}
+
+/* ============================================================
+   KEYFRAMES — ported from the reference
+   ============================================================ */
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  70% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes navLinkFade {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeinout {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Scroll-cue wheel */
+@keyframes move {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+}
+
+@keyframes rotate-circle {
+  0% {
+    transform: rotate(-45deg);
+  }
+  5% {
+    transform: rotate(-45deg);
+  }
+  12% {
+    transform: rotate(-405deg);
+  }
+  100% {
+    transform: rotate(-405deg);
+  }
+}
+
+@keyframes icon-line-tip {
+  0% {
+    width: 0;
+    left: 1px;
+    top: 19px;
+  }
+  54% {
+    width: 0;
+    left: 1px;
+    top: 19px;
+  }
+  70% {
+    width: 50px;
+    left: -8px;
+    top: 37px;
+  }
+  84% {
+    width: 17px;
+    left: 21px;
+    top: 48px;
+  }
+  100% {
+    width: 25px;
+    left: 14px;
+    top: 45px;
+  }
+}
+
+@keyframes icon-line-long {
+  0% {
+    width: 0;
+    right: 46px;
+    top: 54px;
+  }
+  65% {
+    width: 0;
+    right: 46px;
+    top: 54px;
+  }
+  84% {
+    width: 55px;
+    right: 0;
+    top: 35px;
+  }
+  100% {
+    width: 47px;
+    right: 8px;
+    top: 38px;
+  }
+}
+
+@keyframes fall {
+  from {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   The reference ships none of this; it is carried forward from
+   the previous build because it is the right thing to keep.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .circle,
+  .circle-inner,
+  .circle-label {
+    display: none !important;
+  }
+
+  /* Keep the scroll cue — it is useful signage — but park the wheel dot
+     at rest instead of letting the zeroed keyframe end it at opacity 0. */
+  .mouse .move {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

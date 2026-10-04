@@ -1,0 +1,58 @@
+/* ============================================================
+   DESIGN TOKENS
+   Palette, type and rhythm lifted from the reference design:
+   near-monochrome greys on near-black, one green accent.
+   ============================================================ */
+
+:root {
+  /* Grounds ------------------------------------------------- */
+  --dark-bg: #0f0f0f;
+  --panel: #1b1b1b;
+  --panel-2: #121212;
+  --panel-3: #282828;
+  --panel-4: #303030;
+  --lightbox-bg: #1e1e1e;
+
+  /* Lines & accent ------------------------------------------ */
+  --line: #495057;
+  --line-soft: #3b3b3b;
+  --accent: #059400;
+  --accent-dim: #0a2a0a;
+  --success: #4caf50;
+  --danger: #a33;
+
+  /* Text ladder --------------------------------------------- */
+  --t-1: #ffffff;
+  --t-2: #c2c2c2;
+  --t-3: #a8a8a8;
+  --t-4: #898989;
+  --t-5: #616161;
+  --t-6: #444444;
+
+  /* Rhythm — also the 3D scroll unit the camera steps by ----- */
+  --spacing: 350px;
+
+  /* Project carousel ---------------------------------------- */
+  --box-bg: #121212;
+  --box-border: #dbdbdb;
+  --box-shadow: #000000cc;
+  --crsl-bg: transparent;
+
+  /* Type ---------------------------------------------------- */
+  --font-ui: Lato, "Segoe UI", system-ui, sans-serif;
+  --font-display: "Nanum Myeongjo", Georgia, serif;
+  --font-alt: Bitter, Georgia, serif;
+
+  /* Motion -------------------------------------------------- */
+  --ease-nav: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Layer order --------------------------------------------- */
+  --z-canvas: 0;
+  --z-content: 1;
+  --z-chrome: 2;
+  --z-overlay: 3;
+  --z-nav-loader: 4;
+  --z-cursor: 5;
+  --z-game: 6;
+}

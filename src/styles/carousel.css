@@ -1,0 +1,475 @@
+/* ============================================================
+   3D PROJECT CAROUSEL + LIGHTBOX
+   Each slide is a real box in 3D space: a front face plus two
+   3vw-deep side faces, turned toward or away from the camera
+   depending on its distance from the active index.
+   ============================================================ */
+
+.carousel {
+  --item-w: min(46vw, 620px);
+  --item-h: min(29vw, 390px);
+
+  position: relative;
+  display: block;
+  width: 100%;
+  margin-top: 3rem;
+  padding-top: 2vw;
+  box-sizing: border-box;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+@media (max-width: 900px) {
+  .carousel {
+    --item-w: min(78vw, 520px);
+    --item-h: min(52vw, 340px);
+  }
+}
+
+/* Deliberately NOT clipped here: `overflow: hidden` forces a flattening
+   that destroys preserve-3d. Off-screen slides are clipped by the
+   document's own overflow-x instead. */
+.carousel__body {
+  position: relative;
+  width: 100%;
+  transform-style: preserve-3d;
+}
+
+.carousel__slider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  /* Centres the active slide without measuring the viewport in JS. */
+  padding-left: calc(50% - (var(--item-w) / 2) - 20px);
+  background: var(--crsl-bg);
+  transition: transform 0.5s ease-in-out;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.carousel__slider__item {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  width: var(--item-w);
+  height: var(--item-h);
+  margin: 0 20px;
+  box-sizing: border-box;
+  transform-style: preserve-3d;
+}
+
+.item__3d-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease-in-out;
+  cursor: pointer;
+}
+
+/* Floor shadow under each box */
+.item__3d-frame::after {
+  content: "";
+  position: absolute;
+  bottom: -15%;
+  width: 100%;
+  height: 40px;
+  background: var(--box-shadow);
+  box-shadow: 0 0 5px 5px var(--box-shadow);
+  transform: rotateX(90deg) translate3d(0, -20px, 0);
+  opacity: 0.85;
+}
+
+.item__3d-frame__box {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: var(--box-bg);
+  border-color: var(--box-border);
+  border-width: min(0.15vw, 4px);
+  border-style: solid;
+}
+
+.item__3d-frame__box--front {
+  transform: translate3d(0, 0, 0);
+}
+
+.item__3d-frame__box--right,
+.item__3d-frame__box--left {
+  top: 0;
+  width: 3vw;
+  backface-visibility: hidden;
+}
+
+.item__3d-frame__box--right {
+  right: 0;
+  border-right-width: 0.28vw;
+  transform: translate3d(-1px, 0, -3vw) rotateY(90deg);
+  transform-origin: 100% 50%;
+}
+
+.item__3d-frame__box--left {
+  left: 0;
+  border-left-width: 0.28vw;
+  transform: translate3d(1px, 0, -3vw) rotateY(-90deg);
+  transform-origin: 0 50%;
+}
+
+/* Turn angle by distance from the active slide ---------------- */
+
+.carousel__slider__item[data-pos="0"] .item__3d-frame {
+  transform: rotateY(0deg);
+}
+.carousel__slider__item[data-pos="-1"] .item__3d-frame {
+  transform: rotateY(38deg);
+}
+.carousel__slider__item[data-pos="1"] .item__3d-frame {
+  transform: rotateY(-38deg);
+}
+.carousel__slider__item[data-pos="far"] .item__3d-frame {
+  transform: rotateY(0deg);
+  opacity: 0.35;
+}
+
+.carousel__slider__item[data-pos="0"] .item__3d-frame:hover {
+  transform: rotateY(0deg) translateY(-8px);
+}
+
+/* Front face content ------------------------------------------ */
+
+.item__3d-frame__box--front video,
+.item__3d-frame__box--front img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Typographic poster shown when a project has no clip yet */
+.project-poster {
+  display: grid;
+  align-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  height: 100%;
+  padding: clamp(1rem, 2.5vw, 2.5rem);
+  text-align: center;
+  background: radial-gradient(
+    ellipse at 50% 25%,
+    #1f1f1f 0%,
+    var(--box-bg) 70%
+  );
+}
+
+.project-poster__award {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.7rem;
+  color: var(--medal, var(--t-3));
+  font-size: clamp(9px, 0.7vw, 0.72rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+}
+
+.project-poster__title {
+  color: var(--t-1);
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3.4vw, 3.6rem);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  line-height: 1.1;
+}
+
+.project-poster__tagline {
+  color: var(--t-4);
+  font-size: clamp(0.7rem, 0.95vw, 0.95rem);
+  line-height: 1.5;
+}
+
+.project-poster__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+  margin-top: 0.4rem;
+}
+
+.project-poster__tags span {
+  padding: 0.2rem 0.55rem;
+  color: var(--t-5);
+  font-size: clamp(8px, 0.62vw, 0.68rem);
+  background: #ffffff0a;
+  border-radius: 3px;
+}
+
+.project-poster__cue {
+  margin-top: 0.5rem;
+  color: var(--accent);
+  font-size: clamp(8px, 0.62vw, 0.7rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Caption below the box --------------------------------------- */
+
+.card-info {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6.5rem;
+  height: 6rem;
+  text-align: center;
+  font-size: clamp(13px, 1vw, 1rem);
+  font-weight: 300;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.carousel__slider__item[data-pos="0"] .card-info {
+  opacity: 1;
+}
+
+.card-info h3 {
+  color: var(--t-1);
+  font-family: var(--font-alt);
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+.card-info p {
+  margin-top: 0.3rem;
+  color: var(--t-5);
+  font-size: 0.78rem;
+}
+
+/* Arrows ------------------------------------------------------ */
+
+.carousel__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 8rem;
+}
+
+.carousel__prev,
+.carousel__next {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: var(--t-3);
+  border: 1px solid var(--line-soft);
+  border-radius: 50%;
+  transition: transform 0.25s ease, background 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.carousel__prev:hover,
+.carousel__next:hover {
+  transform: scale(1.12);
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.carousel__counter {
+  min-width: 5ch;
+  color: var(--t-5);
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-align: center;
+}
+
+/* Lightbox ---------------------------------------------------- */
+
+.lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  background: #000000d3;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: var(--z-overlay);
+  animation: fade 0.3s ease both;
+}
+
+.lightbox {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90vw;
+  max-width: 1400px;
+  height: 82vh;
+  overflow: hidden;
+  border-radius: 1rem;
+  z-index: var(--z-nav-loader);
+  animation: fade 0.35s ease both;
+}
+
+.lightbox-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  grid-template-rows: 2fr 1fr;
+  gap: 1rem;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  background: var(--lightbox-bg);
+  border-radius: 1rem;
+}
+
+.lightbox-video-area {
+  grid-row: 1 / span 2;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--box-bg);
+  border-radius: 0.6rem;
+}
+
+.lightbox-video-area video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project-description-container {
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.project-name {
+  color: var(--t-1);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.2vw, 2.2rem);
+  letter-spacing: 0.08em;
+}
+
+.project-role {
+  margin-top: 0.35rem;
+  color: var(--accent);
+  font-size: 0.8rem;
+}
+
+.project-description-text {
+  margin-top: 1rem;
+  color: var(--t-3);
+  font-size: 0.88rem;
+  line-height: 1.75;
+}
+
+.project-case {
+  display: grid;
+  gap: 1.1rem;
+  margin-top: 1.25rem;
+}
+
+.project-case section h4 {
+  margin-bottom: 0.3rem;
+  color: var(--t-5);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.project-case section p {
+  color: var(--t-4);
+  font-size: 0.83rem;
+  line-height: 1.7;
+}
+
+.project-meta {
+  align-self: end;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.project-metric {
+  color: var(--t-2);
+  font-size: 0.82rem;
+}
+
+.project-metric span {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--t-5);
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-start;
+}
+
+.project-tags .tag {
+  padding: 0.25rem 0.6rem;
+  background: #333;
+  border-radius: 0.25rem;
+  color: var(--t-2);
+  font-size: clamp(10px, 0.75vw, 0.75rem);
+}
+
+.lightbox .close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: var(--t-3);
+  background: #00000080;
+  border-radius: 50%;
+  transition: color 0.3s ease, background 0.3s ease;
+}
+
+.lightbox .close:hover {
+  color: #fff;
+  background: var(--danger);
+}
+
+@media (max-width: 900px) {
+  .lightbox {
+    width: 94vw;
+    height: 88vh;
+  }
+  .lightbox-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(160px, 30%) 1fr;
+  }
+  .lightbox-video-area {
+    grid-row: auto;
+  }
+  .project-meta {
+    align-self: start;
+  }
+  .item__3d-frame__box--right,
+  .item__3d-frame__box--left {
+    display: none;
+  }
+  .carousel__slider__item[data-pos="-1"] .item__3d-frame,
+  .carousel__slider__item[data-pos="1"] .item__3d-frame {
+    transform: rotateY(0deg);
+  }
+}

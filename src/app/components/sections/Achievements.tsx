@@ -1,55 +1,58 @@
-import { motion } from "motion/react";
-import { ArrowUpRight } from "lucide-react";
-import { achievements } from "../../data/portfolio";
-import { useMotionPrefs, viewportOnce } from "../../lib/motion";
-import SectionHeading from "../primitives/SectionHeading";
-import { medalIcon } from "../primitives/Medal";
+import type { CSSProperties } from "react";
+import { Award, ArrowUpRight, Medal as MedalIcon, Trophy } from "lucide-react";
+import { achievements, medalColors, type Medal } from "../../data/portfolio";
+import { useI18n } from "../../lib/i18n";
+import SectionTitle from "../primitives/SectionTitle";
 
-export default function Achievements() {
-  const { container, scaleIn } = useMotionPrefs();
+const medalIcon = (medal: Medal) => {
+  if (medal === "gold") return Trophy;
+  if (medal === "select") return Award;
+  return MedalIcon;
+};
+
+type Props = { onOpenProject: (slug: string) => void };
+
+export default function Achievements({ onOpenProject }: Props) {
+  const { t } = useI18n();
 
   return (
-    <section id="achievements" className="section container">
-      <SectionHeading
-        eyebrow="04 / Recognition"
-        title={
-          <>
-            Competitions won and <span className="gradient-text">selections earned.</span>
-          </>
-        }
-        lead="Four national and campus stages where the builds held up under judging — from Smart India Hackathon to Google DevHouse."
-      />
+    <section className="section" id="achievements" data-nav>
+      <SectionTitle title={t("AWARDS-TITLE")} lead={t("AWARDS-TEXT")} />
 
-      <motion.div
-        className="achievements"
-        variants={container}
-        initial="hidden"
-        whileInView="visible"
-        viewport={viewportOnce}
-      >
-        {achievements.map((a) => {
-          const Icon = medalIcon(a.medal);
+      <div className="award-grid">
+        {achievements.map((item) => {
+          const Icon = medalIcon(item.medal);
+
           return (
-            <motion.article className="achievement" key={a.title} variants={scaleIn} data-medal={a.medal}>
-              <div className="achievement-glow" aria-hidden="true" />
-              <div className="achievement-top">
-                <span className="achievement-medal" data-medal={a.medal}>
-                  <Icon size={18} aria-hidden="true" />
-                </span>
-                <span className="achievement-date">{a.date}</span>
+            <article
+              className="award-card"
+              key={item.title}
+              data-reveal
+              style={{ "--medal": medalColors[item.medal] } as CSSProperties}
+            >
+              <div className="award-card__top">
+                <Icon size={22} />
+                <span className="award-card__date">{item.date}</span>
               </div>
-              <h3 className="achievement-title">{a.title}</h3>
-              <p className="achievement-event">{a.event}</p>
-              <p className="achievement-desc">{a.description}</p>
-              {a.projectSlug && (
-                <a href="#projects" className="achievement-link">
-                  View the build <ArrowUpRight size={14} />
-                </a>
-              )}
-            </motion.article>
+
+              <h3>{item.title}</h3>
+              <p className="award-card__event">{item.event}</p>
+              <p>{item.description}</p>
+
+              {item.projectSlug ? (
+                <button
+                  type="button"
+                  className="award-card__link"
+                  onClick={() => onOpenProject(item.projectSlug as string)}
+                >
+                  {t("AWARDS-LINK")}
+                  <ArrowUpRight size={13} />
+                </button>
+              ) : null}
+            </article>
           );
         })}
-      </motion.div>
+      </div>
     </section>
   );
 }

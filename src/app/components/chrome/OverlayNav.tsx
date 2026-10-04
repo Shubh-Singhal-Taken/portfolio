@@ -3,6 +3,7 @@ import { Github, Linkedin, Mail } from "lucide-react";
 import { navItems } from "../../lib/navigation";
 import { useI18n } from "../../lib/i18n";
 import { scrollToSection } from "../../lib/scroll";
+import { lockScroll } from "../../lib/scrollLock";
 import { identity } from "../../data/portfolio";
 
 type Props = {
@@ -18,8 +19,8 @@ export default function OverlayNav({ open, onToggle, onClose, activeId }: Props)
 
   // Lock the page behind the overlay and restore focus on close.
   useEffect(() => {
-    document.body.classList.toggle("no-scroll", open);
-    return () => document.body.classList.remove("no-scroll");
+    if (!open) return;
+    return lockScroll();
   }, [open]);
 
   useEffect(() => {

@@ -22,10 +22,7 @@ export class PortfolioScene {
   readonly camera: THREE.PerspectiveCamera;
 
   private renderer: THREE.WebGLRenderer;
-  private raycaster = new THREE.Raycaster();
-  private pointer = new THREE.Vector2(-2, -2);
   private disposables: Disposable[] = [];
-  private interactive: THREE.Object3D[] = [];
   private stars: THREE.Points[] = [];
   private spinners: THREE.Object3D[] = [];
   private clock = new THREE.Clock();
@@ -80,9 +77,6 @@ export class PortfolioScene {
       this.disposables.push(item.disposable);
     }
 
-    // Only the solids answer the raycaster; stars would make the
-    // cursor flicker constantly.
-    this.interactive = [torus.mesh, sphere.mesh, ico.mesh, box.mesh];
     this.spinners = [torus.mesh, ico.mesh, box.mesh];
     step(0.68);
 
@@ -97,22 +91,6 @@ export class PortfolioScene {
 
   setProgress(progress: number) {
     this.progress = progress;
-  }
-
-  setPointer(clientX: number, clientY: number) {
-    this.pointer.x = (clientX / window.innerWidth) * 2 - 1;
-    this.pointer.y = -(clientY / window.innerHeight) * 2 + 1;
-  }
-
-  clearPointer() {
-    this.pointer.set(-2, -2);
-  }
-
-  /** True when the pointer is over one of the solid objects. */
-  hitTest(): boolean {
-    if (this.pointer.x < -1.5) return false;
-    this.raycaster.setFromCamera(this.pointer, this.camera);
-    return this.raycaster.intersectObjects(this.interactive, false).length > 0;
   }
 
   resize() {
@@ -165,7 +143,6 @@ export class PortfolioScene {
       material.dispose();
     }
     this.disposables = [];
-    this.interactive = [];
     this.spinners = [];
     this.stars = [];
 

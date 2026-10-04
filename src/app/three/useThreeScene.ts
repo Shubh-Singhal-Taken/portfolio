@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { PortfolioScene } from "./scene";
 import { onScrollChange } from "../lib/scroll";
-import { cursorHot } from "../lib/signal";
 
 const prefersReducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -51,10 +50,6 @@ export function useThreeScene({ onProgress, onReady }: Options) {
         readyRef.current?.();
       }
 
-      // Hit-testing every frame is cheap here (4 objects) and keeps the
-      // cursor in lockstep with the camera rather than the pointer alone.
-      cursorHot.set(scene.hitTest());
-
       if (!paused) frame = requestAnimationFrame(loop);
     };
 
@@ -75,15 +70,6 @@ export function useThreeScene({ onProgress, onReady }: Options) {
       if (reduced) scene.render(false);
     };
 
-    const onPointerMove = (e: PointerEvent) => {
-      scene.setPointer(e.clientX, e.clientY);
-    };
-
-    const onPointerLeave = () => {
-      scene.clearPointer();
-      cursorHot.set(false);
-    };
-
     const onVisibility = () => {
       if (reduced) return;
 
@@ -97,8 +83,6 @@ export function useThreeScene({ onProgress, onReady }: Options) {
     };
 
     window.addEventListener("resize", onResize);
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    window.addEventListener("pointerleave", onPointerLeave);
     document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
@@ -106,10 +90,7 @@ export function useThreeScene({ onProgress, onReady }: Options) {
       cancelAnimationFrame(frame);
       unsubscribe();
       window.removeEventListener("resize", onResize);
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("pointerleave", onPointerLeave);
       document.removeEventListener("visibilitychange", onVisibility);
-      cursorHot.set(false);
       scene.dispose();
     };
   }, []);

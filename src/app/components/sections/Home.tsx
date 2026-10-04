@@ -23,7 +23,7 @@ function Word({ text, serif }: { text: string; serif?: boolean }) {
 }
 
 export default function Home({ ready }: Props) {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const nameRef = useRef<HTMLDivElement>(null);
   const typedElRef = useRef<HTMLSpanElement>(null);
   const restRef = useRef<HTMLDivElement>(null);
@@ -64,7 +64,7 @@ export default function Home({ ready }: Props) {
     };
   }, [ready]);
 
-  // Typed.js role line. Rebuilt when the locale changes.
+  // Typed.js role line.
   useEffect(() => {
     if (!ready || !typedElRef.current) return;
 
@@ -94,7 +94,7 @@ export default function Home({ ready }: Props) {
     });
 
     return () => typed.destroy();
-  }, [ready, locale, t]);
+  }, [ready, t]);
 
   return (
     <section className="section" id="section-home" data-nav>
@@ -126,13 +126,6 @@ export default function Home({ ready }: Props) {
             into it; the box itself only reserves the space. */}
         <div className="hero-portrait" data-portrait-hero aria-hidden="true" />
         <PortraitParticles ready={ready} />
-      </div>
-
-      <div id="scroll-down-animation" aria-hidden="true">
-        <span className="mouse">
-          <span className="move" />
-        </span>
-        <span>{t("SCROLL-CUE")}</span>
       </div>
     </section>
   );

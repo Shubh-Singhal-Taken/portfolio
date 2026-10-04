@@ -135,40 +135,6 @@
     0 0 10px #c2c2c2, 0 0 15px #c2c2c2, 0 0 20px #c2c2c2;
 }
 
-#scroll-down-animation {
-  position: absolute;
-  left: 50%;
-  bottom: 4vh;
-  transform: translateX(-50%);
-  display: grid;
-  justify-items: center;
-  gap: 0.6rem;
-  color: var(--t-5);
-  font-size: 0.62rem;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-}
-
-.mouse {
-  display: inline-block;
-  width: 0.9vw;
-  min-width: 12px;
-  height: 4.5vh;
-  min-height: 26px;
-  border: 2px solid rgba(122, 122, 124, 0.918);
-  border-radius: 50px;
-}
-
-.mouse .move {
-  display: block;
-  width: 2px;
-  height: 6px;
-  margin: 5px auto 0;
-  background: var(--t-3);
-  border-radius: 1px;
-  animation: move 1.6s ease infinite;
-}
-
 @media (max-width: 1024px) {
   .name-container {
     font-size: 7vw;
@@ -1000,6 +966,13 @@
 .delivering .message {
   color: var(--t-2);
   font-size: 0.9rem;
+}
+
+.delivering .message-email {
+  color: var(--t-1);
+  font-size: 0.95rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 /* ------------------------------------------------------------

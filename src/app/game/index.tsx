@@ -4,6 +4,7 @@ import { GameEngine } from "./engine";
 import { initialState, type GameState, type RadarBlip } from "./types";
 import Hud from "./Hud";
 import Tutorial from "./Tutorial";
+import { lockScroll } from "../lib/scrollLock";
 
 type Props = { onExit: () => void };
 
@@ -18,10 +19,10 @@ export default function Game({ onExit }: Props) {
   // Hold the portfolio still underneath and restore it on the way out.
   useEffect(() => {
     const scrollY = window.scrollY;
-    document.body.classList.add("no-scroll");
+    const release = lockScroll();
 
     return () => {
-      document.body.classList.remove("no-scroll");
+      release();
       window.scrollTo({ top: scrollY, behavior: "auto" });
     };
   }, []);

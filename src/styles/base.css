@@ -197,21 +197,6 @@ ol {
   }
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-  70% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
-}
-
 @keyframes navLinkFade {
   from {
     opacity: 0;
@@ -248,21 +233,6 @@ ol {
   }
   50% {
     opacity: 1;
-  }
-}
-
-/* Scroll-cue wheel */
-@keyframes move {
-  0% {
-    transform: translateY(0);
-    opacity: 0;
-  }
-  40% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(14px);
-    opacity: 0;
   }
 }
 
@@ -360,19 +330,5 @@ ol {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
-  }
-
-  .circle,
-  .circle-inner,
-  .circle-label {
-    display: none !important;
-  }
-
-  /* Keep the scroll cue — it is useful signage — but park the wheel dot
-     at rest instead of letting the zeroed keyframe end it at opacity 0. */
-  .mouse .move {
-    animation: none;
-    opacity: 1;
-    transform: none;
   }
 }

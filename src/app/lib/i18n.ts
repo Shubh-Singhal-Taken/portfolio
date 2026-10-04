@@ -1,27 +1,15 @@
-import { createContext, useContext } from "react";
+/* Every user-facing string in one table, so copy is edited in one place
+   rather than hunted for across components. English only; a second
+   language would come back as a parallel table keyed the same way. */
 
-/* Mirrors the reference site's `key="..."` string table.
-   English is authoritative and complete. Any locale may be partial —
-   missing keys fall back to English, so the page can never render a
-   raw key or an empty node. */
-
-export const LOCALES = [
-  { id: "en", label: "ENG", name: "English" },
-  { id: "hi", label: "हिं", name: "हिन्दी" },
-] as const;
-
-export type LocaleId = (typeof LOCALES)[number]["id"];
-
-const en = {
+const strings = {
   "LOADER-TEXT": "AI / ML ENGINEER",
-  "CIRCLE-LABEL": "Click To Enable Sound",
   HOME: "| AI/ML & IOT ENGINEER |",
   "HOME-TYPED-1": "AI/ML & IoT Engineer",
   "HOME-TYPED-2": "Autonomous Systems Builder",
   "HOME-TYPED-3": "Edge AI & Computer Vision",
   "HOME-TYPED-4": "Robotics & Embedded Engineer",
   "CONTACT-BTN": "Get In Touch",
-  "SCROLL-CUE": "Scroll",
 
   "HOME-MENU": "Home",
   "ABOUT-MENU": "About",
@@ -69,57 +57,22 @@ const en = {
   "SEND-SPAN": "Send",
   "SEND-SENDING": "Sending",
   SUCCESS: "Your message has been sent — I'll get back to you as soon as I can.",
-  FAILED: "Something went wrong. Please email me directly instead.",
+  FAILED: "The message couldn't be sent. Please email me directly instead:",
+  HANDOFF:
+    "Your email app should open with the message ready to send. If it didn't, write to me at:",
 
   COPYRIGHT_TEXT: "© {year} Shubh Singhal — All rights reserved.",
   FOOTER_PRIVACY_LINK: "Back to top",
 
-  "MUSIC-TEXT": "Ambient track",
-  "SOUND-ON": "Sound on",
-  "SOUND-OFF": "Sound off",
   "GAME-OPEN": "Open game",
   "GAME-BACK": "Back to portfolio",
   "MENU-OPEN": "Open menu",
   "MENU-CLOSE": "Close menu",
-  "LANG-LABEL": "Language",
 } as const;
 
-export type StringKey = keyof typeof en;
+export type StringKey = keyof typeof strings;
 
-/* Partial by design: fill these in and they take over automatically.
-   Anything absent renders the English string. */
-const hi: Partial<Record<StringKey, string>> = {
-  "HOME-MENU": "होम",
-  "ABOUT-MENU": "परिचय",
-  "SERVICE-MENU": "क्षमताएँ",
-  "PROJECTS-MENU": "प्रोजेक्ट्स",
-  "AWARDS-MENU": "सम्मान",
-  "JOURNEY-MENU": "यात्रा",
-  "CONTACT-MENU": "संपर्क",
-  "CONTACT-BTN": "संपर्क करें",
-  "SEND-SPAN": "भेजें",
-  "SCROLL-CUE": "स्क्रॉल",
-};
+const t = (key: StringKey): string => strings[key];
 
-const dictionaries: Record<LocaleId, Partial<Record<StringKey, string>>> = {
-  en,
-  hi,
-};
-
-export function translate(locale: LocaleId, key: StringKey): string {
-  return dictionaries[locale]?.[key] ?? en[key];
-}
-
-export type I18n = {
-  locale: LocaleId;
-  setLocale: (locale: LocaleId) => void;
-  t: (key: StringKey) => string;
-};
-
-export const I18nContext = createContext<I18n>({
-  locale: "en",
-  setLocale: () => {},
-  t: (key) => en[key],
-});
-
-export const useI18n = () => useContext(I18nContext);
+/** Kept as a hook so components read copy the same way everywhere. */
+export const useI18n = () => ({ t });

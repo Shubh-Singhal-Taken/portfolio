@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { projectVideoSrc, type Project } from "../../data/portfolio";
 import { useI18n } from "../../lib/i18n";
+import { lockScroll } from "../../lib/scrollLock";
 
 type Props = {
   project: Project;
@@ -16,7 +17,7 @@ export default function ProjectLightbox({ project, onClose }: Props) {
 
   useEffect(() => {
     const opener = document.activeElement as HTMLElement | null;
-    document.body.classList.add("no-scroll");
+    const release = lockScroll();
     closeRef.current?.focus();
 
     const onKey = (e: KeyboardEvent) => {
@@ -50,7 +51,7 @@ export default function ProjectLightbox({ project, onClose }: Props) {
 
     return () => {
       window.removeEventListener("keydown", onKey);
-      document.body.classList.remove("no-scroll");
+      release();
       opener?.focus?.();
     };
   }, [onClose]);

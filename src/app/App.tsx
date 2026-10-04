@@ -1,26 +1,16 @@
-import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import { Toaster } from "sonner";
 
 import { useThreeScene } from "./three/useThreeScene";
 import { useActiveSection } from "./lib/useActiveSection";
 import { useRevealAnimations } from "./lib/reveal";
 import { refreshScroll } from "./lib/scroll";
-import { setAudioDucked } from "./lib/audio";
-import {
-  I18nContext,
-  translate,
-  type LocaleId,
-  type StringKey,
-} from "./lib/i18n";
+import { lockScroll } from "./lib/scrollLock";
 import { projects } from "./data/portfolio";
 
 import LoadingScreen from "./components/chrome/LoadingScreen";
-import RingCursor from "./components/chrome/RingCursor";
 import OverlayNav from "./components/chrome/OverlayNav";
 import DotNav from "./components/chrome/DotNav";
-import SoundBar from "./components/chrome/SoundBar";
-import MusicCredits from "./components/chrome/MusicCredits";
-import LangDropdown from "./components/chrome/LangDropdown";
 import GameButton from "./components/chrome/GameButton";
 
 import Home from "./components/sections/Home";
@@ -36,17 +26,10 @@ import ProjectLightbox from "./components/projects/ProjectLightbox";
 // The space-combat sim is a world of its own — never in the entry chunk.
 const Game = lazy(() => import("./game"));
 
-/** Minimum time the loader stays up, so the counter is readable. */
-const LOADER_FLOOR_MS = 1400;
-
-
 export default function App() {
-  const [locale, setLocale] = useState<LocaleId>("en");
   const [progress, setProgress] = useState(0);
   const [sceneReady, setSceneReady] = useState(false);
-  const [floorElapsed, setFloorElapsed] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
-  const [cursorLabel, setCursorLabel] = useState(true);
   const [projectIndex, setProjectIndex] = useState(0);
   const [openSlug, setOpenSlug] = useState<string | null>(null);
   const [gameOpen, setGameOpen] = useState(false);
@@ -58,44 +41,19 @@ export default function App() {
     onReady: () => setSceneReady(true),
   });
 
-  const done = sceneReady && floorElapsed;
+  // The loader clears as soon as the first frame has been painted.
+  const done = sceneReady;
 
   useRevealAnimations(done);
 
-  const i18n = useMemo(
-    () => ({
-      locale,
-      setLocale,
-      t: (key: StringKey) => translate(locale, key),
-    }),
-    [locale]
-  );
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => setFloorElapsed(true), LOADER_FLOOR_MS);
-    return () => window.clearTimeout(timer);
-  }, []);
-
-
   // Hold the page still behind the loader, then let it go and re-measure.
   useEffect(() => {
-    document.body.classList.toggle("no-scroll", !done);
-    if (done) refreshScroll();
+    if (done) {
+      refreshScroll();
+      return;
+    }
+    return lockScroll();
   }, [done]);
-
-  // The cursor's "click to enable sound" prompt retires after any click.
-  useEffect(() => {
-    if (!cursorLabel) return;
-
-    const onClick = () => setCursorLabel(false);
-    window.addEventListener("click", onClick, { once: true });
-    return () => window.removeEventListener("click", onClick);
-  }, [cursorLabel]);
-
-  // Duck the ambient bed while the game holds the screen.
-  useEffect(() => {
-    setAudioDucked(gameOpen);
-  }, [gameOpen]);
 
   /* Opened from the carousel — it is already on the right slide. */
   const openProject = useCallback((slug: string) => setOpenSlug(slug), []);
@@ -118,7 +76,7 @@ export default function App() {
     : null;
 
   return (
-    <I18nContext.Provider value={i18n}>
+    <>
       <a href="#main" className="skip-link">
         Skip to content
       </a>
@@ -127,12 +85,7 @@ export default function App() {
       <Toaster position="top-right" theme="dark" richColors />
 
       <canvas id="main-content" ref={canvasRef} aria-hidden="true" />
-      {/* The sound prompt only makes sense once the site is visible. */}
-      <RingCursor showLabel={cursorLabel && done} />
 
-      <SoundBar />
-      <MusicCredits />
-      <LangDropdown />
       <DotNav activeId={activeId} />
       <OverlayNav
         open={navOpen}
@@ -171,6 +124,6 @@ export default function App() {
           <Game onExit={() => setGameOpen(false)} />
         </Suspense>
       ) : null}
-    </I18nContext.Provider>
+    </>
   );
 }

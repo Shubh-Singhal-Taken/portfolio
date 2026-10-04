@@ -2,10 +2,10 @@ import { useState, type FormEvent } from "react";
 import { Github, Linkedin, Mail, Send } from "lucide-react";
 import { identity } from "../../data/portfolio";
 import { useI18n } from "../../lib/i18n";
-import { sendContactMessage } from "../../lib/emailjs";
+import { isConfigured, mailtoFor, sendContactMessage } from "../../lib/emailjs";
 import SectionTitle from "../primitives/SectionTitle";
 
-type Status = "idle" | "sending" | "sent" | "failed";
+type Status = "idle" | "sending" | "sent" | "handoff" | "failed";
 
 function CheckIcon() {
   return (
@@ -37,6 +37,14 @@ export default function Contact() {
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (status === "sending") return;
+
+    // No delivery service configured: hand the message to the visitor's
+    // own email app, already written, instead of claiming it was sent.
+    if (!isConfigured) {
+      window.location.href = mailtoFor(form);
+      setStatus("handoff");
+      return;
+    }
 
     setStatus("sending");
 
@@ -78,18 +86,27 @@ export default function Contact() {
         </div>
 
         <div data-reveal>
-          {status === "sent" || status === "failed" ? (
+          {status === "sent" || status === "handoff" || status === "failed" ? (
             <div className="delivering" role="status" aria-live="polite">
-              {status === "sent" ? <CheckIcon /> : <BanIcon />}
+              {status === "failed" ? <BanIcon /> : <CheckIcon />}
               <p className="message">
-                {status === "sent" ? t("SUCCESS") : t("FAILED")}
+                {status === "sent"
+                  ? t("SUCCESS")
+                  : status === "handoff"
+                    ? t("HANDOFF")
+                    : t("FAILED")}
               </p>
+              {status === "sent" ? null : (
+                <a className="message-email" href={`mailto:${identity.email}`}>
+                  {identity.email}
+                </a>
+              )}
               <button
                 type="button"
                 className="sendBtn"
                 onClick={() => setStatus("idle")}
               >
-                {status === "sent" ? t("PROJECT-CLOSE") : t("SEND-SPAN")}
+                {status === "failed" ? t("SEND-SPAN") : t("PROJECT-CLOSE")}
               </button>
             </div>
           ) : (

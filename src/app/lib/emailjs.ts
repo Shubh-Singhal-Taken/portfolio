@@ -1,9 +1,11 @@
 /* Contact delivery.
 
-   When the three VITE_EMAILJS_* variables are present the form posts a
-   real message. When they are absent — a fresh clone, a preview build —
-   it resolves successfully instead of throwing, so the form is never a
-   dead control. `isConfigured` lets the UI say which mode it is in. */
+   With the three VITE_EMAILJS_* variables set, the form posts the message
+   through EmailJS. Without them there is nowhere to post it, so the form
+   hands the message to the visitor's own email app instead (a prefilled
+   mailto:) rather than pretending it was sent. */
+
+import { identity } from "../data/portfolio";
 
 const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID as string | undefined;
 const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID as
@@ -20,12 +22,7 @@ export type ContactPayload = {
 };
 
 export async function sendContactMessage(payload: ContactPayload) {
-  if (!isConfigured) {
-    // Simulate the round trip so the success animation is honest about
-    // taking a moment, then resolve.
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    return;
-  }
+  if (!isConfigured) throw new Error("EmailJS is not configured");
 
   // Loaded on demand so the SDK stays out of the initial bundle.
   const { default: emailjs } = await import("@emailjs/browser");
@@ -40,4 +37,11 @@ export async function sendContactMessage(payload: ContactPayload) {
     },
     { publicKey: PUBLIC_KEY as string }
   );
+}
+
+/** A mailto: link carrying the message, for when EmailJS is not set up. */
+export function mailtoFor(payload: ContactPayload): string {
+  const subject = `Portfolio enquiry from ${payload.name}`;
+  const body = `${payload.message}\n\n${payload.name}\n${payload.email}`;
+  return `mailto:${identity.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }

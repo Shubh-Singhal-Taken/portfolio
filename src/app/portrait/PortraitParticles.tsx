@@ -1,45 +1,45 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { samplePortrait } from "./sampleImage";
-import { EYE, HAIR, loadHeadCloud, type HeadCloud } from "./headCloud";
+import { buildGalaxy, type Galaxy } from "./galaxy";
 
 /* The star portrait, as particles.
 
    Stars drift in from across the viewport and settle into the portrait
-   inside the element marked [data-portrait-hero]. Scrolling toward the
-   element marked [data-portrait-head] carries them across into a
-   sculpted 3D head (baked by scripts/sculpt-head.mts) that turns to look
-   at the cursor; scrolling past it scatters them back into the stars.
+   inside [data-portrait-hero]. Scrolling toward [data-portrait-galaxy]
+   unwinds the portrait from the outside in: its stars pour out in one
+   curving stream and wind into a slowly turning spiral galaxy beside and
+   beneath that element, with the face arriving last as the bright core.
+   Scrolling past it dissolves the galaxy back into the star field.
 
    Both targets are measured from the live layout every frame, so the
-   effect follows the page at any width instead of assuming where the
-   hero sits. The canvas is portalled to <body> and painted beneath the
-   page content, so particles never sit on top of text. */
+   effect follows the page at any width. The canvas is portalled to
+   <body> and painted beneath the page content, so particles never sit on
+   top of text. */
 
 type Props = { ready: boolean };
 
 const PORTRAIT_SRC = "/portrait.png";
-const HEAD_SRC = "/head-cloud.bin";
 const BUCKETS = 10;
 const FILLS = Array.from(
   { length: BUCKETS },
   (_, i) => `rgba(255, 255, 255, ${((i + 1) / BUCKETS).toFixed(2)})`
 );
 
-/* Bust extents from headSculpt.ts: hair crown to the neck cut */
-const BUST_TOP = 1.12;
-const BUST_BOTTOM = -1.5;
-const BUST_MID = (BUST_TOP + BUST_BOTTOM) / 2;
-const BUST_HALF_WIDTH = 0.88;
-const CAMERA_DISTANCE = 6;
+/* Galaxy presentation */
+const TILT = 1.08; // radians from edge-on; ~62°, an open ellipse
+const ROLL = -0.32; // screen-space lean of the disc
+const SPIN = 0.035; // radians per second
+const PERSPECTIVE = 0.35;
 
-/* With no cursor to look at, the head faces the About panel. */
-const REST_YAW = 0.3;
-const REST_PITCH = -0.04;
+/* Share of the morph spent staggering departures: outer stars of the
+   portrait leave first, the face last. */
+const STAGGER = 0.45;
 
 /* The formation plays once per visit; later mounts start fully formed. */
 let formedThisVisit = false;
 
+const TAU = Math.PI * 2;
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 const smoothstep = (a: number, b: number, v: number) => {
   const t = clamp01((v - a) / (b - a));
@@ -64,13 +64,12 @@ export default function PortraitParticles({ ready }: Props) {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const coarse = window.matchMedia("(pointer: coarse)").matches;
     const heroEl = document.querySelector<HTMLElement>("[data-portrait-hero]");
-    const headEl = document.querySelector<HTMLElement>("[data-portrait-head]");
+    const galaxyEl = document.querySelector<HTMLElement>("[data-portrait-galaxy]");
     if (!heroEl) return;
 
     let disposed = false;
     let frame = 0;
     let running = false;
-    let headTimer = 0;
 
     /* ---------------- canvas size ---------------- */
 
@@ -88,15 +87,12 @@ export default function PortraitParticles({ ready }: Props) {
 
     /* ---------------- pointer ---------------- */
 
-    const pointer = { x: 0, y: 0, ex: 0, ey: 0, clientX: 0, clientY: 0, active: false };
+    const pointer = { x: 0, y: 0, ex: 0, ey: 0, active: false };
     const onPointerMove = (e: PointerEvent) => {
       pointer.x = e.clientX / vw - 0.5;
       pointer.y = e.clientY / vh - 0.5;
-      pointer.clientX = e.clientX;
-      pointer.clientY = e.clientY;
       pointer.active = true;
     };
-    const gaze = { yaw: REST_YAW, pitch: REST_PITCH };
     const onPointerLeave = () => {
       pointer.active = false;
     };
@@ -117,6 +113,13 @@ export default function PortraitParticles({ ready }: Props) {
     let twinkleSpeed = new Float32Array(0);
     let twinklePhase = new Float32Array(0);
     let scatter = new Float32Array(0);
+    let departure = new Float32Array(0);
+    let bend = new Float32Array(0);
+
+    let galaxy: Galaxy | null = null;
+    let galaxyIndex = new Int32Array(0);
+    let galaxyX = new Float32Array(0);
+    let galaxyY = new Float32Array(0);
 
     // Per-frame scratch, reused
     let outX = new Float32Array(0);
@@ -126,52 +129,8 @@ export default function PortraitParticles({ ready }: Props) {
     let order = new Int32Array(0);
     const bucketStart = new Int32Array(BUCKETS + 1);
 
-    let head: HeadCloud | null = null;
-    let headIndex = new Int32Array(0);
-    let headX = new Float32Array(0);
-    let headY = new Float32Array(0);
-    let headA = new Float32Array(0);
-    let headSize = new Float32Array(0);
-
     let startTime: number | null = null;
     let cleared = true;
-
-    const pairWithHead = (h: HeadCloud) => {
-      // Match portrait particles to head points top-to-bottom, so the
-      // crown of the portrait becomes the crown of the bust rather than
-      // every star crossing the screen.
-      const byPortraitY = Array.from({ length: count }, (_, i) => i).sort((a, b) => ty[a] - ty[b]);
-      const byHeadY = Array.from({ length: h.count }, (_, i) => i).sort(
-        (a, b) => h.positions[b * 3 + 1] - h.positions[a * 3 + 1]
-      );
-
-      headIndex = new Int32Array(count);
-      for (let k = 0; k < count; k++) {
-        const j = Math.floor((k / count) * h.count);
-        headIndex[byPortraitY[k]] = byHeadY[Math.min(h.count - 1, j)];
-      }
-
-      headX = new Float32Array(h.count);
-      headY = new Float32Array(h.count);
-      headA = new Float32Array(h.count);
-      // Hair dots finer than skin, so the two surfaces read as different
-      headSize = new Float32Array(h.count);
-      for (let j = 0; j < h.count; j++) {
-        headSize[j] = h.kind[j] === HAIR ? 0.6 : h.kind[j] === EYE ? 0.7 : 0.8;
-      }
-      head = h;
-    };
-
-    const loadHead = () => {
-      if (!headEl || disposed) return;
-      loadHeadCloud(HEAD_SRC, count)
-        .then((cloud) => {
-          if (!disposed && cloud.count > 0) pairWithHead(cloud);
-        })
-        .catch(() => {
-          // No head: the portrait simply scatters on scroll instead.
-        });
-    };
 
     samplePortrait(PORTRAIT_SRC, vw < 768 ? 3800 : 9500)
       .then((targets) => {
@@ -191,6 +150,8 @@ export default function PortraitParticles({ ready }: Props) {
         twinkleSpeed = new Float32Array(count);
         twinklePhase = new Float32Array(count);
         scatter = new Float32Array(count);
+        departure = new Float32Array(count);
+        bend = new Float32Array(count);
         outX = new Float32Array(count);
         outY = new Float32Array(count);
         outR = new Float32Array(count);
@@ -198,17 +159,18 @@ export default function PortraitParticles({ ready }: Props) {
         order = new Int32Array(count);
 
         for (let i = 0; i < count; i++) {
-          const angle = Math.random() * Math.PI * 2;
+          const angle = Math.random() * TAU;
           const dist = 0.4 + Math.random() * 0.9;
           startX[i] = 0.5 + Math.cos(angle) * dist;
           startY[i] = 0.5 + Math.sin(angle) * dist;
           delay[i] = Math.random() * 1.1;
           duration[i] = 1.2 + Math.random() * 0.95;
           curveAmp[i] = (Math.random() - 0.5) * 0.35;
-          curveAngle[i] = Math.random() * Math.PI * 2;
+          curveAngle[i] = Math.random() * TAU;
           twinkleSpeed[i] = 1.5 + Math.random() * 3.5;
-          twinklePhase[i] = Math.random() * Math.PI * 2;
+          twinklePhase[i] = Math.random() * TAU;
           scatter[i] = 0.6 + Math.random() * 0.4;
+          bend[i] = 0.25 + Math.random() * 0.3;
 
           const feature = targets.feature[i] === 1;
           const flare = !feature && Math.random() < 0.03;
@@ -218,9 +180,31 @@ export default function PortraitParticles({ ready }: Props) {
             : Math.max(0.35, 0.4 + targets.brightness[i] * 0.5);
         }
 
-        // The bust is only needed once the visitor scrolls; let the
-        // formation have the network and the main thread first.
-        headTimer = window.setTimeout(loadHead, 1200);
+        if (galaxyEl) {
+          const g = buildGalaxy(count);
+          galaxyX = new Float32Array(g.count);
+          galaxyY = new Float32Array(g.count);
+
+          // Pair by distance from the centre: the outskirts of the portrait
+          // become the outer arms and the face becomes the core.
+          const portraitR = (i: number) => Math.hypot(tx[i] - 0.5, ty[i] - 0.42);
+          const byPortrait = Array.from({ length: count }, (_, i) => i).sort(
+            (a, b) => portraitR(a) - portraitR(b)
+          );
+          const byGalaxy = Array.from({ length: g.count }, (_, j) => j).sort(
+            (a, b) => g.radius[a] - g.radius[b]
+          );
+
+          galaxyIndex = new Int32Array(count);
+          for (let k = 0; k < count; k++) {
+            const i = byPortrait[k];
+            galaxyIndex[i] = byGalaxy[Math.floor((k / count) * g.count)];
+            // Unwind from the outside in: the outermost leave first
+            departure[i] = (1 - k / count) * STAGGER;
+          }
+          galaxy = g;
+        }
+
         if (running) schedule();
       })
       .catch(() => {
@@ -248,20 +232,32 @@ export default function PortraitParticles({ ready }: Props) {
       const heroTop = hr.top + (hr.height - side) / 2;
       const heroCenter = hr.top + hr.height / 2;
 
-      // Morph progress: 0 with the hero centred in the viewport, 1 with
-      // the head slot centred.
+      // Morph progress: 0 with the hero centred in the viewport, 1 once
+      // the galaxy's core has come up to the middle of the screen.
       let morph = 0;
-      let hd: DOMRect | null = null;
-      if (head && headEl) {
-        hd = headEl.getBoundingClientRect();
-        const headCenter = hd.top + hd.height / 2;
-        const span = headCenter - heroCenter;
-        if (span > 1) morph = smoothstep(0.12, 0.88, (vh / 2 - heroCenter) / span);
+      let gr: DOMRect | null = null;
+      let gcx = 0;
+      let gcy = 0;
+      if (galaxy && galaxyEl) {
+        gr = galaxyEl.getBoundingClientRect();
+        // Desktop: the core sits in the open space left of the panel and
+        // the arms sweep under its glass. Narrow screens: the core sits
+        // just above the panel. Either way it is anchored near the top of
+        // a tall panel, so the galaxy forms while its opening is on screen.
+        if (vw >= 900) {
+          gcx = gr.left - Math.min(560, vw * 0.36) * 0.3;
+          gcy = gr.top + Math.min(gr.height / 2, vh * 0.5);
+        } else {
+          gcx = gr.left + gr.width / 2;
+          gcy = gr.top - Math.min(vw * 0.5, 260) * 0.12;
+        }
+        const span = gcy - heroCenter;
+        if (span > 1) morph = clamp01((vh / 2 - heroCenter) / span);
       }
 
-      // Scatter once the last target scrolls up out of view
-      const anchorBottom = hd ? hd.bottom : hr.bottom;
-      const disperse = clamp01((vh * 0.3 - anchorBottom) / (vh * 0.45));
+      // Dissolve once the panel has mostly scrolled away
+      const anchorBottom = gr ? gr.bottom : hr.bottom;
+      const disperse = clamp01((vh * 0.45 - anchorBottom) / (vh * 0.5));
 
       if (disperse >= 1 || hr.top > vh) {
         if (!cleared) {
@@ -273,65 +269,41 @@ export default function PortraitParticles({ ready }: Props) {
         return;
       }
 
-      // Project the bust for this frame
-      if (head && hd && morph > 0.001) {
-        const scale = Math.min(
-          (hd.height * 0.94) / (BUST_TOP - BUST_BOTTOM),
-          (hd.width * 0.94) / (2 * BUST_HALF_WIDTH)
-        );
-        const cx = hd.left + hd.width / 2;
-        const cy = hd.top + hd.height / 2;
+      const useGalaxy = galaxy !== null && gr !== null && morph > 0.001;
 
-        // Look toward the cursor; with none (touch, or not moved yet),
-        // rest facing the About panel. Reduced motion holds the rest pose.
-        let targetYaw = REST_YAW;
-        let targetPitch = REST_PITCH;
-        if (pointer.active && !coarse && !reduced) {
-          targetYaw = Math.max(-0.9, Math.min(0.9, Math.atan2(pointer.clientX - cx, 700) * 1.4));
-          targetPitch = Math.max(-0.3, Math.min(0.3, Math.atan2(pointer.clientY - (cy + BUST_MID * scale), 900) * 1.1));
-        }
-        gaze.yaw += (targetYaw - gaze.yaw) * (reduced ? 1 : 0.06);
-        gaze.pitch += (targetPitch - gaze.pitch) * (reduced ? 1 : 0.06);
-        const yaw = gaze.yaw;
-        const pitch = gaze.pitch;
+      // Project the galaxy for this frame
+      if (useGalaxy && galaxy && gr) {
+        const radius = vw >= 900 ? Math.min(560, vw * 0.36) : Math.min(vw * 0.5, 260);
+        const spin = reduced ? 0.6 : 0.6 + elapsed * SPIN;
+        const tilt = TILT + (coarse || reduced ? 0 : pointer.ey * 0.25);
+        const roll = ROLL + (coarse || reduced ? 0 : pointer.ex * 0.2);
+        const cs = Math.cos(spin);
+        const ss = Math.sin(spin);
+        const ct = Math.cos(tilt);
+        const st = Math.sin(tilt);
+        const cr = Math.cos(roll);
+        const sr = Math.sin(roll);
+        const { x, y, z } = galaxy;
 
-        const cyaw = Math.cos(yaw);
-        const syaw = Math.sin(yaw);
-        const cp = Math.cos(pitch);
-        const sp = Math.sin(pitch);
-        const { positions, normals, shade } = head;
-
-        for (let j = 0; j < head.count; j++) {
-          const x = positions[j * 3];
-          const y = positions[j * 3 + 1];
-          const z = positions[j * 3 + 2];
-
-          const x1 = x * cyaw + z * syaw;
-          const z1 = -x * syaw + z * cyaw;
-          const y2 = y * cp - z1 * sp;
-          const z2 = y * sp + z1 * cp;
-
-          const nz1 = -normals[j * 3] * syaw + normals[j * 3 + 2] * cyaw;
-          const facing = normals[j * 3 + 1] * sp + nz1 * cp;
-
-          const f = CAMERA_DISTANCE / (CAMERA_DISTANCE - z2);
-          headX[j] = cx + x1 * scale * f;
-          headY[j] = cy - (y2 - BUST_MID) * scale * f;
-          // Fade out as the surface turns away, with a slight lift right at
-          // the silhouette so the outline of the head holds as it turns
-          const visible = smoothstep(-0.04, 0.12, facing);
-          const rim = 1 - smoothstep(0.12, 0.45, facing);
-          headA[j] = Math.min(1, (0.3 + 0.7 * shade[j] + 0.25 * rim) * visible);
+        for (let j = 0; j < galaxy.count; j++) {
+          // Spin in the disc plane, tilt toward the viewer, then lean
+          const x1 = x[j] * cs - z[j] * ss;
+          const z1 = x[j] * ss + z[j] * cs;
+          const y2 = y[j] * ct - z1 * st;
+          const z2 = y[j] * st + z1 * ct;
+          const f = 1 / (1 - z2 * PERSPECTIVE * 0.5);
+          const sx = x1 * f;
+          const sy = y2 * f;
+          galaxyX[j] = gcx + (sx * cr - sy * sr) * radius;
+          galaxyY[j] = gcy - (sx * sr + sy * cr) * radius;
         }
       }
 
       const parallaxX = coarse ? 0 : pointer.ex * 18;
       const parallaxY = coarse ? 0 : pointer.ey * 18;
-      const swirl = Math.sin(morph * Math.PI) * Math.min(vw, vh) * 0.35;
-      const push = disperse * Math.max(vw, vh) * 0.55;
+      const push = disperse * Math.max(vw, vh) * 0.6;
       const fade = 1 - disperse;
-      const useHead = head !== null && morph > 0.001;
-      const crossfade = reduced && useHead;
+      const crossfade = reduced && useGalaxy;
 
       let formedAll = true;
 
@@ -346,6 +318,7 @@ export default function PortraitParticles({ ready }: Props) {
         let x: number;
         let y: number;
         let a: number;
+        let r = size[i];
 
         if (progress < 1) {
           const ease = 1 - Math.pow(1 - progress, 3);
@@ -359,17 +332,33 @@ export default function PortraitParticles({ ready }: Props) {
           x = hx;
           y = hy;
 
-          if (useHead && !crossfade) {
-            const j = headIndex[i];
-            const s = swirl * curveAmp[i];
-            x = hx + (headX[j] - hx) * morph + Math.sin(twinklePhase[i]) * s;
-            y = hy + (headY[j] - hy) * morph + Math.cos(twinklePhase[i]) * s;
-            a = a + (headA[j] - a) * morph;
+          if (useGalaxy && !crossfade && galaxy) {
+            const j = galaxyIndex[i];
+            const t = smoothstep(departure[i], departure[i] + (1 - STAGGER), morph);
+
+            if (t > 0) {
+              // A quadratic curve whose control point is pushed off to one
+              // side of the straight line: every star bends the same way,
+              // so the portrait pours out as one stream instead of each
+              // star sliding across on its own.
+              const gx = galaxyX[j];
+              const gy = galaxyY[j];
+              const dx = gx - hx;
+              const dy = gy - hy;
+              const cx = (hx + gx) / 2 - dy * bend[i];
+              const cy = (hy + gy) / 2 + dx * bend[i];
+              const u = 1 - t;
+              x = u * u * hx + 2 * u * t * cx + t * t * gx;
+              y = u * u * hy + 2 * u * t * cy + t * t * gy;
+              // Galaxy alpha: the core glows, the arms and halo are fainter
+              a = a + (galaxy.brightness[j] * (0.75 + twinkle) - a) * t;
+              r = size[i] + (galaxy.size[j] - size[i]) * t;
+            }
           }
         }
 
         if (disperse > 0) {
-          const angle = (i / count) * Math.PI * 2 + twinklePhase[i];
+          const angle = (i / count) * TAU + twinklePhase[i];
           x += Math.cos(angle) * push * scatter[i];
           y += Math.sin(angle) * push * scatter[i];
         }
@@ -380,7 +369,7 @@ export default function PortraitParticles({ ready }: Props) {
         a *= fade;
         outX[i] = x;
         outY[i] = y;
-        outR[i] = useHead && !crossfade ? size[i] + (headSize[headIndex[i]] - size[i]) * morph : size[i];
+        outR[i] = r;
         outBucket[i] = a <= 0.01 ? -1 : Math.min(BUCKETS - 1, Math.floor(a * BUCKETS));
       }
 
@@ -411,7 +400,7 @@ export default function PortraitParticles({ ready }: Props) {
           const r = outR[i];
           if (r > 1.1) {
             ctx.moveTo(outX[i] + r, outY[i]);
-            ctx.arc(outX[i], outY[i], r, 0, Math.PI * 2);
+            ctx.arc(outX[i], outY[i], r, 0, TAU);
           } else {
             // A one-to-two pixel dot is indistinguishable from a square
             // and an order of magnitude cheaper to rasterise than an arc.
@@ -419,14 +408,15 @@ export default function PortraitParticles({ ready }: Props) {
           }
         }
 
-        // Reduced-motion crossfade: the bust fades in where it stands
-        if (crossfade && head) {
+        // Reduced-motion crossfade: the galaxy fades in where it stands
+        if (crossfade && galaxy) {
           for (let i = 0; i < count; i++) {
-            const j = headIndex[i];
-            const ha = headA[j] * morph * fade;
-            if (ha <= 0.01 || Math.min(BUCKETS - 1, Math.floor(ha * BUCKETS)) !== b) continue;
+            const j = galaxyIndex[i];
+            const ga = galaxy.brightness[j] * 0.75 * morph * fade;
+            if (ga <= 0.01 || Math.min(BUCKETS - 1, Math.floor(ga * BUCKETS)) !== b) continue;
             any = true;
-            ctx.rect(headX[j] - 0.75, headY[j] - 0.75, 1.5, 1.5);
+            const gs = galaxy.size[j];
+            ctx.rect(galaxyX[j] - gs, galaxyY[j] - gs, gs * 2, gs * 2);
           }
         }
 
@@ -471,7 +461,7 @@ export default function PortraitParticles({ ready }: Props) {
       { rootMargin: "25% 0px 25% 0px" }
     );
     observer.observe(heroEl);
-    if (headEl) observer.observe(headEl);
+    if (galaxyEl) observer.observe(galaxyEl);
 
     const onResize = () => {
       resize();
@@ -487,7 +477,6 @@ export default function PortraitParticles({ ready }: Props) {
       disposed = true;
       running = false;
       if (frame) cancelAnimationFrame(frame);
-      window.clearTimeout(headTimer);
       observer.disconnect();
       window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onPointerMove);

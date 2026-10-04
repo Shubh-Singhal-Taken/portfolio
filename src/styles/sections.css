@@ -190,36 +190,18 @@
    ABOUT
    ------------------------------------------------------------ */
 
-.about-grid {
-  display: grid;
-  grid-template-columns: 0.85fr 1.15fr;
-  align-items: center;
-  gap: clamp(1.5rem, 3vw, 3.5rem);
-  width: 100%;
-}
-
-.about-head {
-  /* Reserves the space the sculpted head is drawn into. */
-  width: 100%;
-  height: min(44vw, 540px);
-  min-height: 380px;
-}
-
-@media (max-width: 900px) {
-  /* Head above the panel on narrow screens. */
-  .about-grid {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-
-  .about-head {
-    height: clamp(240px, 70vw, 360px);
-    min-height: 0;
+/* Frosted glass over the galaxy: dense enough to keep the text crisp,
+   clear enough for the spiral to glow through. */
+@media (min-width: 900px) {
+  /* Leave open space on the left for the galaxy's core */
+  #about .section-panel {
+    max-width: min(800px, 62%);
+    margin-left: auto;
   }
 }
 
 #about .section-panel {
-  background: rgba(20, 20, 25, 0.45);
+  background: rgba(20, 20, 25, 0.58);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);

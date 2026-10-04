@@ -61,10 +61,9 @@ export default function About() {
 
   return (
     <section className="section" id="about" data-nav>
-      <div className="about-grid">
-        <div className="about-head" data-portrait-head aria-hidden="true" />
-        <div className="section-panel">
-          <SectionTitle title={t("ABOUT-TITLE")} />
+      {/* The portrait's stars become a galaxy turning behind this panel */}
+      <div className="section-panel" data-portrait-galaxy>
+        <SectionTitle title={t("ABOUT-TITLE")} />
 
         <p className="about-text" data-reveal>
           {aboutText}
@@ -201,7 +200,6 @@ export default function About() {
           </a>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
   );
 }

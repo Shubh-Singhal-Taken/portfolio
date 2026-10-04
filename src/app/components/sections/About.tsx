@@ -62,7 +62,7 @@ export default function About() {
   return (
     <section className="section" id="about" data-nav>
       <div className="about-grid">
-        <div className="about-visual-spacer" aria-hidden="true" />
+        <div className="about-head" data-portrait-head aria-hidden="true" />
         <div className="section-panel">
           <SectionTitle title={t("ABOUT-TITLE")} />
 

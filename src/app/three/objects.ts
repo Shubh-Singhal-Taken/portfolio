@@ -102,7 +102,7 @@ export function createIcosahedron() {
   });
 
   const mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(-52, 14, -130);
+  mesh.position.set(52, 14, -130);
 
   return { mesh, disposable: { geometry, material } satisfies Disposable };
 }

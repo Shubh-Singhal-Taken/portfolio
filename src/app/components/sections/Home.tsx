@@ -5,7 +5,7 @@ import { identity } from "../../data/portfolio";
 import { useI18n } from "../../lib/i18n";
 import { scrollToSection } from "../../lib/scroll";
 
-import PortraitParticleCanvas from "./PortraitParticleCanvas";
+import PortraitParticles from "../../portrait/PortraitParticles";
 
 type Props = { ready: boolean };
 
@@ -122,9 +122,10 @@ export default function Home({ ready }: Props) {
           </div>
         </div>
 
-        <div className="hero-portrait">
-          <PortraitParticleCanvas ready={ready} />
-        </div>
+        {/* The particle canvas measures this box and draws the portrait
+            into it; the box itself only reserves the space. */}
+        <div className="hero-portrait" data-portrait-hero aria-hidden="true" />
+        <PortraitParticles ready={ready} />
       </div>
 
       <div id="scroll-down-animation" aria-hidden="true">

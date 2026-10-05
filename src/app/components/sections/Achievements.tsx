@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { Award, ArrowUpRight, Medal as MedalIcon, Trophy } from "lucide-react";
-import { achievements, medalColors, type Medal } from "../../content";
+import { achievements, medalColors, type Achievement, type Medal } from "../../content";
 import { useI18n } from "../../lib/i18n";
 import SectionTitle from "../primitives/SectionTitle";
 
@@ -10,9 +10,13 @@ const medalIcon = (medal: Medal) => {
   return MedalIcon;
 };
 
-type Props = { onOpenProject: (slug: string) => void };
+type Props = {
+  onOpenProject: (slug: string) => void;
+  /** Defaults to everything; lens pages pass their own ordered list. */
+  items?: Achievement[];
+};
 
-export default function Achievements({ onOpenProject }: Props) {
+export default function Achievements({ onOpenProject, items = achievements }: Props) {
   const { t } = useI18n();
 
   return (
@@ -20,7 +24,7 @@ export default function Achievements({ onOpenProject }: Props) {
       <SectionTitle title={t("AWARDS-TITLE")} lead={t("AWARDS-TEXT")} />
 
       <div className="award-grid">
-        {achievements.map((item) => {
+        {items.map((item) => {
           const Icon = medalIcon(item.medal);
 
           return (

@@ -1,0 +1,475 @@
+/* ============================================================
+   LENS PAGES — /software, /ai, /iot
+   Same palette and type as the front page; tighter rhythm, because a
+   recruiter is scanning for proof rather than taking the tour.
+   ============================================================ */
+
+.lens-page .section {
+  margin-bottom: clamp(160px, 22vh, 260px);
+}
+
+/* ------------------------------------------------------------
+   HERO
+   ------------------------------------------------------------ */
+
+.lens-hero {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  padding-top: 64px;
+}
+
+.lens-page .lens-hero {
+  margin-bottom: clamp(80px, 12vh, 160px);
+}
+
+.lens-hero__copy {
+  max-width: 36rem;
+}
+
+.lens-hero__kicker {
+  color: var(--t-4);
+  font-size: 0.76rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.lens-hero__headline {
+  margin-top: 1.25rem;
+  color: var(--t-1);
+  font-family: var(--font-display);
+  font-size: clamp(2.3rem, 4.6vw, 4.4rem);
+  font-weight: 400;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.lens-hero__sub {
+  max-width: 32rem;
+  margin-top: 1.5rem;
+  color: var(--t-3);
+  font-size: clamp(1rem, 1.2vw, 1.2rem);
+  line-height: 1.7;
+}
+
+.lens-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem 2rem;
+  margin-top: 2.25rem;
+}
+
+.lens-hero__actions .contact-Btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.lens-hero__link {
+  color: var(--t-2);
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+
+.lens-hero__link:hover,
+.lens-hero__link:focus-visible {
+  color: var(--t-1);
+}
+
+@media (max-width: 900px) {
+  .lens-hero {
+    padding-top: 96px;
+  }
+
+  .lens-hero__copy {
+    max-width: none;
+  }
+}
+
+/* ------------------------------------------------------------
+   SELECTED WORK
+   ------------------------------------------------------------ */
+
+.work-award {
+  display: inline-block;
+  padding: 0.35rem 0.6rem;
+  color: var(--medal);
+  border: 1px solid color-mix(in srgb, var(--medal) 45%, transparent);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.work-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 1.5rem;
+}
+
+.work-tags li {
+  padding: 0.3rem 0.6rem;
+  color: var(--t-3);
+  background: var(--panel-3);
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.work-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1.75rem;
+  padding-bottom: 0.25rem;
+  color: var(--t-1);
+  border-bottom: 1px solid var(--accent);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: gap 0.2s var(--ease-out);
+}
+
+.work-open:hover,
+.work-open:focus-visible {
+  gap: 0.7rem;
+}
+
+/* Lead case: the strongest proof gets the full width */
+.work-lead {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  margin-top: 3rem;
+  padding: clamp(1.75rem, 3.5vw, 3.25rem);
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+}
+
+.work-lead__title {
+  margin-top: 1.25rem;
+  color: var(--t-1);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.4vw, 3.2rem);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.work-lead__copy > .work-lead__title:first-child {
+  margin-top: 0;
+}
+
+.work-lead__tagline {
+  margin-top: 0.5rem;
+  color: var(--t-3);
+  font-size: 1rem;
+}
+
+.work-lead__summary {
+  max-width: 58ch;
+  margin-top: 1.25rem;
+  color: var(--t-2);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.work-lead__outcome {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-left: clamp(1.25rem, 3vw, 3rem);
+  border-left: 1px solid var(--line-soft);
+}
+
+.work-lead__outcome-label {
+  color: var(--accent);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.work-lead__metric {
+  color: var(--t-1);
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.6vw, 2.5rem);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.work-lead__meta {
+  color: var(--t-4);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* The pair: deliberately uneven so the row does not read as a template */
+.work-pair {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: clamp(1rem, 2vw, 1.75rem);
+  margin-top: clamp(1rem, 2vw, 1.75rem);
+}
+
+.work-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: clamp(1.5rem, 2.5vw, 2.25rem);
+  background: var(--panel-2);
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+}
+
+.work-card__title {
+  margin-top: 1rem;
+  color: var(--t-1);
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.2vw, 2rem);
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.work-card > .work-card__title:first-child {
+  margin-top: 0;
+}
+
+.work-card__tagline {
+  margin-top: 0.4rem;
+  color: var(--t-3);
+  font-size: 0.95rem;
+}
+
+.work-card__metric {
+  margin-top: 1.25rem;
+  color: var(--t-1);
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.work-card .work-tags {
+  margin-bottom: 1.75rem;
+}
+
+.work-card .work-open {
+  margin-top: auto;
+}
+
+/* The rest: a list to scan */
+.work-more {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+}
+
+.work-more__title {
+  margin-bottom: 0.75rem;
+  color: var(--t-4);
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+.work-more li + li .work-more__row {
+  border-top: 1px solid var(--line-soft);
+}
+
+.work-more__row {
+  display: grid;
+  grid-template-columns: minmax(10rem, 1fr) 2fr auto auto;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  padding: 1.1rem 0.5rem;
+  color: var(--t-3);
+  text-align: left;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.work-more__row:hover,
+.work-more__row:focus-visible {
+  color: var(--t-1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.work-more__name {
+  color: var(--t-1);
+  font-size: 1.05rem;
+}
+
+.work-more__tagline {
+  font-size: 0.92rem;
+}
+
+.work-more__date {
+  color: var(--t-5);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .work-lead,
+  .work-pair {
+    grid-template-columns: 1fr;
+  }
+
+  .work-lead__outcome {
+    padding-top: 1.5rem;
+    padding-left: 0;
+    border-top: 1px solid var(--line-soft);
+    border-left: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .work-more__row {
+    grid-template-columns: 1fr auto;
+    gap: 0.25rem 1rem;
+  }
+
+  .work-more__tagline {
+    grid-column: 1;
+  }
+
+  .work-more__date {
+    display: none;
+  }
+
+  .work-more__row svg {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+  }
+}
+
+/* ------------------------------------------------------------
+   EXPERIENCE — the galaxy settles beside and beneath this panel
+   ------------------------------------------------------------ */
+
+.lens-experience .section-panel {
+  background: rgba(20, 20, 25, 0.58);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+@media (min-width: 900px) {
+  .lens-experience .section-panel {
+    max-width: min(820px, 62%);
+    margin-left: auto;
+  }
+}
+
+.roles {
+  display: grid;
+  gap: 2.75rem;
+  margin-top: 2.25rem;
+}
+
+.role__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem 2rem;
+}
+
+.role__title {
+  color: var(--t-1);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.role__org {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--t-3);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.role__when {
+  color: var(--t-3);
+  font-size: 0.85rem;
+  text-align: right;
+}
+
+.role__when span {
+  display: block;
+  color: var(--t-4);
+}
+
+.role__previous {
+  margin-top: 0.6rem;
+  color: var(--t-4);
+  font-size: 0.88rem;
+  font-style: italic;
+}
+
+.role__bullets {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1.1rem;
+}
+
+.role__bullets li {
+  position: relative;
+  padding-left: 1.2rem;
+  color: var(--t-2);
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+
+.role__bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.82em;
+  width: 0.5rem;
+  height: 1px;
+  background: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .role__when {
+    text-align: left;
+  }
+}
+
+/* ------------------------------------------------------------
+   SKILLS
+   ------------------------------------------------------------ */
+
+.skill-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: clamp(1.75rem, 3vw, 2.75rem) clamp(1.5rem, 3vw, 3rem);
+  margin-top: 3rem;
+}
+
+.skill-group__label {
+  padding-bottom: 0.7rem;
+  color: var(--t-1);
+  border-bottom: 1px solid var(--line-soft);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.skill-group__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.9rem;
+}
+
+.skill-group__list li {
+  padding: 0.35rem 0.65rem;
+  color: var(--t-2);
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  border-radius: 4px;
+  font-size: 0.85rem;
+}

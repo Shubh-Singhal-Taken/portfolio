@@ -1,19 +1,22 @@
 import { useEffect, useRef } from "react";
 import { Github, Linkedin, Mail } from "lucide-react";
-import { navItems } from "../../lib/navigation";
+import { NavLink } from "react-router-dom";
+import type { NavItem } from "../../lib/navigation";
 import { useI18n } from "../../lib/i18n";
 import { scrollToSection } from "../../lib/scroll";
 import { lockScroll } from "../../lib/scrollLock";
-import { identity } from "../../content";
+import { LENSES, identity, lenses } from "../../content";
 
 type Props = {
+  /** This page's sections. */
+  items: NavItem[];
   open: boolean;
   onToggle: () => void;
   onClose: () => void;
   activeId: string;
 };
 
-export default function OverlayNav({ open, onToggle, onClose, activeId }: Props) {
+export default function OverlayNav({ items, open, onToggle, onClose, activeId }: Props) {
   const { t } = useI18n();
   const burgerRef = useRef<HTMLButtonElement>(null);
 
@@ -65,7 +68,7 @@ export default function OverlayNav({ open, onToggle, onClose, activeId }: Props)
         className={`nav-list${open ? " is-active is-visible" : ""}`}
         aria-hidden={!open}
       >
-        {navItems.map((item, i) => (
+        {items.map((item, i) => (
           <li
             key={item.id}
             style={{ animationDelay: open ? `${i * 0.07 + 0.15}s` : undefined }}
@@ -83,6 +86,25 @@ export default function OverlayNav({ open, onToggle, onClose, activeId }: Props)
             </a>
           </li>
         ))}
+
+        {/* The other pages: the front page and the three profiles */}
+        <li className="nav-pages-item">
+          <nav className="nav-pages" aria-label={t("PAGES-LABEL")}>
+            <NavLink to="/" end tabIndex={open ? 0 : -1} onClick={onClose}>
+              {identity.name}
+            </NavLink>
+            {LENSES.map((id) => (
+              <NavLink
+                key={id}
+                to={lenses[id].path}
+                tabIndex={open ? 0 : -1}
+                onClick={onClose}
+              >
+                {lenses[id].role}
+              </NavLink>
+            ))}
+          </nav>
+        </li>
 
         <li className="nav-social-item">
           <div className="nav-social">

@@ -93,12 +93,97 @@
 }
 
 /* ------------------------------------------------------------
+   TOP BAR
+   ------------------------------------------------------------ */
+
+.top-bar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 4vw, 3rem);
+  /* Right padding leaves room for the menu button */
+  padding: 0 calc(max(1rem, 3vw) + 52px) 0 max(1rem, 3vw);
+  border-bottom: 1px solid transparent;
+  z-index: var(--z-chrome);
+  transition: background 0.3s ease, border-color 0.3s ease,
+    backdrop-filter 0.3s ease;
+}
+
+.top-bar.is-scrolled {
+  background: rgba(15, 15, 15, 0.72);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.top-bar__home {
+  color: var(--t-2);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.top-bar__home:hover,
+.top-bar__home:focus-visible {
+  color: var(--t-1);
+}
+
+.top-bar__lenses {
+  display: flex;
+  gap: clamp(1.1rem, 2.5vw, 2.25rem);
+  margin-left: auto;
+}
+
+.top-bar__lens {
+  position: relative;
+  padding: 0.5rem 0;
+  color: var(--t-4);
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+
+.top-bar__lens:hover,
+.top-bar__lens:focus-visible,
+.top-bar__lens.active {
+  color: var(--t-1);
+}
+
+.top-bar__lens.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.15rem;
+  height: 2px;
+  background: var(--accent);
+}
+
+@media (max-width: 600px) {
+  /* The lenses matter more than the name on a phone; home stays one
+     tap away in the menu. */
+  .top-bar__home {
+    display: none;
+  }
+
+  .top-bar__lenses {
+    margin-left: 0;
+  }
+}
+
+/* ------------------------------------------------------------
    BURGER + FULLSCREEN OVERLAY NAV
    ------------------------------------------------------------ */
 
 .mobile-menu {
   position: fixed;
-  top: 2.5vh;
+  /* Centred on the 64px top bar */
+  top: 18px;
   right: max(1rem, 3vw);
   display: grid;
   gap: 5px;
@@ -300,4 +385,30 @@
   .game-button {
     display: none;
   }
+}
+
+/* Page links inside the overlay: smaller than the section links */
+.nav-pages-item {
+  margin-top: 1.5rem;
+}
+
+.nav-pages {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.75rem;
+}
+
+.nav-pages a {
+  color: var(--t-4);
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+
+.nav-pages a:hover,
+.nav-pages a:focus-visible,
+.nav-pages a.active {
+  color: var(--t-1);
 }

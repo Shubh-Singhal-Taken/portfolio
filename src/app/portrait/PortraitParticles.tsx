@@ -251,8 +251,12 @@ export default function PortraitParticles({ ready }: Props) {
           gcx = gr.left + gr.width / 2;
           gcy = gr.top - Math.min(vw * 0.5, 260) * 0.12;
         }
+        // The flight covers at most ~1.25 screens of scroll. Where the
+        // galaxy sits far below the hero (a lens page, with Selected work
+        // in between), the portrait first rides up and away with the hero
+        // and its stars pour back down only as the galaxy approaches.
         const span = gcy - heroCenter;
-        if (span > 1) morph = clamp01((vh / 2 - heroCenter) / span);
+        if (span > 1) morph = clamp01(1 - (gcy - vh / 2) / Math.min(span, vh * 1.25));
       }
 
       // Dissolve once the panel has mostly scrolled away

@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { navItems } from "./navigation";
+import type { NavItem } from "./navigation";
 
 /* Scroll-spy shared by the overlay nav and the dot nav.
-   The band is deliberately narrow — a section counts as active only
-   once it occupies the middle of the viewport. */
+   The band is deliberately narrow: a section counts as active only once
+   it occupies the middle of the viewport. */
 
-export function useActiveSection(): string {
-  const [activeId, setActiveId] = useState(navItems[0].id);
+export function useActiveSection(items: NavItem[]): string {
+  const [activeId, setActiveId] = useState(items[0]?.id ?? "");
 
   useEffect(() => {
-    const sections = navItems
+    const sections = items
       .map((item) => document.getElementById(item.id))
       .filter((el): el is HTMLElement => el !== null);
 
@@ -27,7 +27,7 @@ export function useActiveSection(): string {
     for (const section of sections) observer.observe(section);
 
     return () => observer.disconnect();
-  }, []);
+  }, [items]);
 
   return activeId;
 }

@@ -7,6 +7,7 @@ import { lockScroll } from "./lib/scrollLock";
 import { SceneReadyContext } from "./lib/sceneReady";
 
 import LoadingScreen from "./components/chrome/LoadingScreen";
+import TopBar from "./components/chrome/TopBar";
 import Footer from "./components/sections/Footer";
 
 /* The shell every page shares: the WebGL scene, the loader and the
@@ -45,6 +46,7 @@ export default function Layout() {
 
       <LoadingScreen progress={progress} done={ready} />
       <canvas id="main-content" ref={canvasRef} aria-hidden="true" />
+      <TopBar />
 
       <div className="shell">
         <Outlet />

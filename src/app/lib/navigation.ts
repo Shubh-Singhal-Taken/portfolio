@@ -1,7 +1,7 @@
 import type { StringKey } from "./i18n";
 
-/* Section order is the scroll order, the overlay-nav order and the
-   dot-nav order. One list drives all three. */
+/* In-page sections for each kind of page. Order is the scroll order, the
+   overlay-nav order and the dot-nav order; one list drives all three. */
 
 export type NavItem = {
   id: string;
@@ -9,12 +9,23 @@ export type NavItem = {
   key: StringKey;
 };
 
-export const navItems: NavItem[] = [
-  { id: "section-home", href: "#section-home", key: "HOME-MENU" },
-  { id: "about", href: "#about", key: "ABOUT-MENU" },
-  { id: "service", href: "#service", key: "SERVICE-MENU" },
-  { id: "projects", href: "#projects", key: "PROJECTS-MENU" },
-  { id: "achievements", href: "#achievements", key: "AWARDS-MENU" },
-  { id: "journey", href: "#journey", key: "JOURNEY-MENU" },
-  { id: "contact", href: "#contact", key: "CONTACT-MENU" },
+const item = (id: string, key: StringKey): NavItem => ({ id, href: `#${id}`, key });
+
+export const homeSections: NavItem[] = [
+  item("section-home", "HOME-MENU"),
+  item("about", "ABOUT-MENU"),
+  item("service", "SERVICE-MENU"),
+  item("projects", "PROJECTS-MENU"),
+  item("achievements", "AWARDS-MENU"),
+  item("journey", "JOURNEY-MENU"),
+  item("contact", "CONTACT-MENU"),
+];
+
+export const lensSections: NavItem[] = [
+  item("lens-top", "INTRO-MENU"),
+  item("work", "WORK-MENU"),
+  item("experience", "EXPERIENCE-MENU"),
+  item("skills", "SKILLS-MENU"),
+  item("achievements", "AWARDS-MENU"),
+  item("contact", "CONTACT-MENU"),
 ];

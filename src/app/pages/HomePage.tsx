@@ -1,6 +1,7 @@
 import { Suspense, lazy, useCallback, useState } from "react";
 
 import { useActiveSection } from "../lib/useActiveSection";
+import { homeSections } from "../lib/navigation";
 import { useRevealAnimations } from "../lib/reveal";
 import { useSceneReady } from "../lib/sceneReady";
 import { identity, projects, projectsInOrder } from "../content";
@@ -30,7 +31,7 @@ export default function HomePage() {
   const [openSlug, setOpenSlug] = useState<string | null>(null);
   const [gameOpen, setGameOpen] = useState(false);
 
-  const activeId = useActiveSection();
+  const activeId = useActiveSection(homeSections);
   useRevealAnimations(ready);
 
   /* Opened from the carousel, which is already on the right slide. */
@@ -58,8 +59,9 @@ export default function HomePage() {
         path="/"
       />
 
-      <DotNav activeId={activeId} />
+      <DotNav items={homeSections} activeId={activeId} />
       <OverlayNav
+        items={homeSections}
         open={navOpen}
         onToggle={() => setNavOpen((o) => !o)}
         onClose={() => setNavOpen(false)}

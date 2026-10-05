@@ -1,15 +1,51 @@
-import { Link } from "react-router-dom";
+import { useCallback, useMemo, useState } from "react";
 import PageMeta from "../components/PageMeta";
-import { identity, lenses, type Lens } from "../content";
+import OverlayNav from "../components/chrome/OverlayNav";
+import DotNav from "../components/chrome/DotNav";
+import LensHero from "../components/lens/LensHero";
+import SelectedWork from "../components/lens/SelectedWork";
+import ExperienceSection from "../components/lens/ExperienceSection";
+import SkillsSection from "../components/lens/SkillsSection";
+import Achievements from "../components/sections/Achievements";
+import Contact from "../components/sections/Contact";
+import ProjectLightbox from "../components/projects/ProjectLightbox";
+import {
+  achievements,
+  experienceFor,
+  forLens,
+  identity,
+  lenses,
+  projects,
+  type Lens,
+} from "../content";
+import { lensSections } from "../lib/navigation";
+import { useActiveSection } from "../lib/useActiveSection";
+import { useRevealAnimations } from "../lib/reveal";
+import { useSceneReady } from "../lib/sceneReady";
 
 type Props = { lens: Lens };
 
-/* Route scaffold for /software, /ai and /iot. The full lens page (hero,
-   experience, selected work, skills, recognition) is built in the next
-   phase; this proves routing, prerendering and per-page titles first. */
+/* One profile page: the same content as the front page, chosen and
+   ordered for the role this lens presents. Proof first (selected work),
+   then where that proof was earned, the tools, the wins, and contact. */
 
 export default function LensPage({ lens }: Props) {
   const profile = lenses[lens];
+  const ready = useSceneReady();
+  const [navOpen, setNavOpen] = useState(false);
+  const [openSlug, setOpenSlug] = useState<string | null>(null);
+
+  const work = useMemo(() => forLens(projects, lens), [lens]);
+  const roles = useMemo(() => experienceFor(lens), [lens]);
+  const wins = useMemo(() => forLens(achievements, lens), [lens]);
+
+  const activeId = useActiveSection(lensSections);
+  useRevealAnimations(ready);
+
+  const openProject = useCallback((slug: string) => setOpenSlug(slug), []);
+  const openProjectData = openSlug
+    ? projects.find((p) => p.slug === openSlug) ?? null
+    : null;
 
   return (
     <>
@@ -19,14 +55,30 @@ export default function LensPage({ lens }: Props) {
         path={profile.path}
       />
 
-      <main id="main">
-        <section className="section">
-          <p>{profile.role}</p>
-          <h1>{profile.headline}</h1>
-          <p>{profile.sub}</p>
-          <Link to="/">{identity.name}</Link>
-        </section>
+      <DotNav items={lensSections} activeId={activeId} />
+      <OverlayNav
+        items={lensSections}
+        open={navOpen}
+        onToggle={() => setNavOpen((o) => !o)}
+        onClose={() => setNavOpen(false)}
+        activeId={activeId}
+      />
+
+      <main id="main" className="lens-page">
+        <LensHero profile={profile} ready={ready} />
+        <SelectedWork projects={work} onOpen={openProject} />
+        <ExperienceSection roles={roles} />
+        <SkillsSection groups={profile.skills} />
+        <Achievements items={wins} onOpenProject={openProject} />
+        <Contact />
       </main>
+
+      {openProjectData ? (
+        <ProjectLightbox
+          project={openProjectData}
+          onClose={() => setOpenSlug(null)}
+        />
+      ) : null}
     </>
   );
 }

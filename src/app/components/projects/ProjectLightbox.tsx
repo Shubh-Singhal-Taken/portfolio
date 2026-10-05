@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
-import { projectVideoSrc, type Project } from "../../data/portfolio";
+import { projectVideoSrc, type Project } from "../../content";
 import { useI18n } from "../../lib/i18n";
 import { lockScroll } from "../../lib/scrollLock";
 

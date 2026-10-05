@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Github, Linkedin, Mail, Send } from "lucide-react";
-import { identity } from "../../data/portfolio";
+import { identity } from "../../content";
 import { useI18n } from "../../lib/i18n";
 import { isConfigured, mailtoFor, sendContactMessage } from "../../lib/emailjs";
 import SectionTitle from "../primitives/SectionTitle";

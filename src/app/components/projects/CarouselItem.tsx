@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { medalColors, projectVideoSrc, type Project } from "../../data/portfolio";
+import { medalColors, projectVideoSrc, type Project } from "../../content";
 import { useI18n } from "../../lib/i18n";
 
 type Props = {

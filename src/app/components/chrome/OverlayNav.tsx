@@ -4,7 +4,7 @@ import { navItems } from "../../lib/navigation";
 import { useI18n } from "../../lib/i18n";
 import { scrollToSection } from "../../lib/scroll";
 import { lockScroll } from "../../lib/scrollLock";
-import { identity } from "../../data/portfolio";
+import { identity } from "../../content";
 
 type Props = {
   open: boolean;

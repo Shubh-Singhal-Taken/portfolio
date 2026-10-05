@@ -6,7 +6,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { Project } from "../../data/portfolio";
+import type { Project } from "../../content";
 import { useI18n } from "../../lib/i18n";
 import CarouselItem from "./CarouselItem";
 

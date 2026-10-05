@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { ChevronRight, Download } from "lucide-react";
 import {
+  LENSES,
   aboutText,
+  certificationIcon,
   certifications,
   education,
   educationIcon as EducationIcon,
-  identity,
+  lenses,
   skillTiers,
   softSkills,
   stats,
-} from "../../data/portfolio";
+} from "../../content";
 import { useI18n } from "../../lib/i18n";
 import SectionTitle from "../primitives/SectionTitle";
 import CountUp from "../primitives/CountUp";
@@ -43,11 +45,9 @@ function CertificationBranch({
       <div className={`child${open ? " is-open" : ""}`}>
         <div>
           <ul>
-            {items.length === 0 ? (
-              <li>Coming soon.</li>
-            ) : (
-              items.map((item) => <li key={item}>{item}</li>)
-            )}
+            {items.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
           </ul>
         </div>
       </div>
@@ -58,6 +58,7 @@ function CertificationBranch({
 export default function About() {
   const { t } = useI18n();
   const [tab, setTab] = useState<Tab>("education");
+  const resumes = LENSES.map((id) => lenses[id]).filter((lens) => lens.resume);
 
   return (
     <section className="section" id="about" data-nav>
@@ -132,14 +133,15 @@ export default function About() {
               </li>
             ))}
 
-            {certifications.map((group) => (
+            {certifications.length ? (
               <CertificationBranch
-                key={group.title}
-                title={group.title}
-                Icon={group.icon}
-                items={group.items}
+                title={t("CERTS-TITLE")}
+                Icon={certificationIcon}
+                items={certifications.map(
+                  (c) => `${c.title}, ${c.issuer}${c.note ? ` (${c.note})` : ""}`
+                )}
               />
-            ))}
+            ) : null}
           </ul>
         </div>
 
@@ -193,12 +195,17 @@ export default function About() {
           </div>
         </div>
 
-        <div className="btn-cv-border">
-          <a className="dcv" href={identity.resume} download>
-            <Download size={15} />
-            {t("DOWNLOAD-CV")}
-          </a>
-        </div>
+        {/* One download per profile, shown only once its PDF exists */}
+        {resumes.length ? (
+          <div className="btn-cv-border">
+            {resumes.map((lens) => (
+              <a className="dcv" href={lens.resume} download key={lens.id}>
+                <Download size={15} />
+                {lens.role} {t("RESUME")}
+              </a>
+            ))}
+          </div>
+        ) : null}
       </div>
     </section>
   );

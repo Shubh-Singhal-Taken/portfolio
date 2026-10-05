@@ -1,4 +1,4 @@
-import { capabilities } from "../../data/portfolio";
+import { capabilities } from "../../content";
 import { useI18n } from "../../lib/i18n";
 import SectionTitle from "../primitives/SectionTitle";
 

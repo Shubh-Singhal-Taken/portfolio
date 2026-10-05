@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import Typed from "typed.js";
 import gsap from "gsap";
-import { identity } from "../../data/portfolio";
+import { identity } from "../../content";
 import { useI18n } from "../../lib/i18n";
 import { scrollToSection } from "../../lib/scroll";
 

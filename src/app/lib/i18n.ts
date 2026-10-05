@@ -22,7 +22,8 @@ const strings = {
   "ABOUT-TITLE": "About",
   "EDU-BTN": "Education",
   "SKILL-BTN": "Skills",
-  "DOWNLOAD-CV": "Download Resume",
+  RESUME: "resume",
+  "CERTS-TITLE": "Certifications",
   "SOFT-SKILLS-TITLE": "Beyond the toolkit",
 
   "SERVICE-TITLE": "Capabilities",
@@ -46,11 +47,11 @@ const strings = {
   "AWARDS-LINK": "View the build",
 
   "JOURNEY-TITLE": "Journey",
-  "JOURNEY-TEXT": "From first hackathon to General Secretary.",
+  "JOURNEY-TEXT": "From a first hackathon to leading a 150-member community and shipping production AI.",
 
   "CONTACT-TITLE": "Contact",
   "CONTACT-TEXT":
-    "Open to AI/ML and IoT roles, research collaborations, and ambitious hardware builds. The fastest way to reach me is email — I reply to everything.",
+    "Open to software, AI and IoT roles, research collaborations and ambitious builds. Email is the fastest way to reach me, and I reply to everything.",
   "FORM-NAME": "Your name",
   "FORM-EMAIL": "Your email",
   "FORM-MESSAGE": "Your message",

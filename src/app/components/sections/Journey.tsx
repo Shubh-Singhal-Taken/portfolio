@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { journey, journeyIcons, journeyLabels } from "../../data/portfolio";
+import { journey, journeyIcons, journeyLabels } from "../../content";
 import { useI18n } from "../../lib/i18n";
 import SectionTitle from "../primitives/SectionTitle";
 

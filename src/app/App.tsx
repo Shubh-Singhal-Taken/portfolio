@@ -6,7 +6,7 @@ import { useActiveSection } from "./lib/useActiveSection";
 import { useRevealAnimations } from "./lib/reveal";
 import { refreshScroll } from "./lib/scroll";
 import { lockScroll } from "./lib/scrollLock";
-import { projects } from "./data/portfolio";
+import { projects, projectsInOrder } from "./content";
 
 import LoadingScreen from "./components/chrome/LoadingScreen";
 import OverlayNav from "./components/chrome/OverlayNav";
@@ -61,10 +61,7 @@ export default function App() {
   /* Opened from an award card — move the carousel to that project first,
      so closing the lightbox leaves the user where they expect to be. */
   const openProjectFromAward = useCallback((slug: string) => {
-    const ordered = [...projects].sort(
-      (a, b) => Number(b.featured) - Number(a.featured)
-    );
-    const index = ordered.findIndex((p) => p.slug === slug);
+    const index = projectsInOrder.findIndex((p) => p.slug === slug);
     if (index < 0) return;
 
     setProjectIndex(index);

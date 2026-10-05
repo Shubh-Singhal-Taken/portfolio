@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { Award, ArrowUpRight, Medal as MedalIcon, Trophy } from "lucide-react";
-import { achievements, medalColors, type Medal } from "../../data/portfolio";
+import { achievements, medalColors, type Medal } from "../../content";
 import { useI18n } from "../../lib/i18n";
 import SectionTitle from "../primitives/SectionTitle";
 
@@ -32,7 +32,7 @@ export default function Achievements({ onOpenProject }: Props) {
             >
               <div className="award-card__top">
                 <Icon size={22} />
-                <span className="award-card__date">{item.date}</span>
+                {item.date ? <span className="award-card__date">{item.date}</span> : null}
               </div>
 
               <h3>{item.title}</h3>

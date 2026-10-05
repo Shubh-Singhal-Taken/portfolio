@@ -5,7 +5,7 @@
    hands the message to the visitor's own email app instead (a prefilled
    mailto:) rather than pretending it was sent. */
 
-import { identity } from "../data/portfolio";
+import { identity } from "../content";
 
 const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID as string | undefined;
 const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID as

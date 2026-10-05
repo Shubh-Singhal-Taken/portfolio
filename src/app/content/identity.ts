@@ -5,6 +5,8 @@ export const identity = {
   first: "Shubh",
   last: "Singhal",
   role: "Software, AI & IoT Engineer",
+  description:
+    "Shubh Singhal is a software, AI and IoT engineer: production LLM pipelines, fault-tolerant backends and ESP32 systems deployed at life scale.",
   site: "https://shubhsinghal.in",
   email: "shubhsinghal.work@gmail.com",
   github: "https://github.com/Shubh-Singhal-Taken",

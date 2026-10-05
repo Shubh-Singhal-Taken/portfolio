@@ -25,6 +25,8 @@ export type LensProfile = {
   headline: string;
   /** ≤ 20 words under the headline. */
   sub: string;
+  /** Search-result and link-preview summary for the lens page. */
+  description: string;
   /** Web copy of the matching resume (no phone number). Left unset until
       the PDF is in public/resume/, so no page ever links to a missing file. */
   resume?: string;
@@ -41,6 +43,8 @@ export const lenses: Record<Lens, LensProfile> = {
     role: "Software Engineer",
     headline: "I build backend systems that keep working under load.",
     sub: "Queues, retries, caching and LLM services, shipped in Node.js, FastAPI and Docker.",
+    description:
+      "Software engineer building fault-tolerant backends: BullMQ pipelines, Redis caching, a 50-API benchmarking service and LLM platforms in Node.js, FastAPI and Docker.",
     skills: [
       {
         label: "Languages & CS",
@@ -80,6 +84,8 @@ export const lenses: Record<Lens, LensProfile> = {
     role: "AI Engineer",
     headline: "I put language models into products people use.",
     sub: "LLM pipelines, multi-provider failover and automated evaluation, from Sanixor.AI to HackEval.",
+    description:
+      "AI engineer putting language models into production: LLM evaluation pipelines, five-provider failover, LSTM forecasting and edge computer vision.",
     provisional: true,
     skills: [
       {
@@ -112,6 +118,8 @@ export const lenses: Record<Lens, LensProfile> = {
     role: "IoT Engineer",
     headline: "I wire sensors, pumps and models into systems that run on their own.",
     sub: "ESP32, MQTT and ThingWorx, deployed at life scale and presented at the National Semiconductor Summit.",
+    description:
+      "IoT engineer wiring ESP32 sensors, pumps and LSTM models into systems deployed at life scale and presented at the National Semiconductor Summit.",
     skills: [
       {
         label: "Embedded",

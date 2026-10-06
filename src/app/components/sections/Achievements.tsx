@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { Link } from "react-router-dom";
 import { Award, ArrowUpRight, Medal as MedalIcon, Trophy } from "lucide-react";
 import { achievements, medalColors, type Achievement, type Medal } from "../../content";
 import { useI18n } from "../../lib/i18n";
@@ -25,12 +26,11 @@ function spans(n: number): number[] {
 }
 
 type Props = {
-  onOpenProject: (slug: string) => void;
   /** Defaults to everything; lens pages pass their own ordered list. */
   items?: Achievement[];
 };
 
-export default function Achievements({ onOpenProject, items = achievements }: Props) {
+export default function Achievements({ items = achievements }: Props) {
   const { t } = useI18n();
   const span = spans(items.length);
 
@@ -64,14 +64,10 @@ export default function Achievements({ onOpenProject, items = achievements }: Pr
               <p>{item.description}</p>
 
               {item.projectSlug ? (
-                <button
-                  type="button"
-                  className="award-card__link"
-                  onClick={() => onOpenProject(item.projectSlug as string)}
-                >
+                <Link className="award-card__link" to={`/projects/${item.projectSlug}`}>
                   {t("AWARDS-LINK")}
                   <ArrowUpRight size={13} />
-                </button>
+                </Link>
               ) : null}
             </article>
           );

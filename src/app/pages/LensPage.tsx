@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import PageMeta from "../components/PageMeta";
 import OverlayNav from "../components/chrome/OverlayNav";
 import DotNav from "../components/chrome/DotNav";
@@ -8,7 +8,6 @@ import ExperienceSection from "../components/lens/ExperienceSection";
 import SkillsSection from "../components/lens/SkillsSection";
 import Achievements from "../components/sections/Achievements";
 import Contact from "../components/sections/Contact";
-import ProjectLightbox from "../components/projects/ProjectLightbox";
 import {
   achievements,
   experienceFor,
@@ -33,7 +32,6 @@ export default function LensPage({ lens }: Props) {
   const profile = lenses[lens];
   const ready = useSceneReady();
   const [navOpen, setNavOpen] = useState(false);
-  const [openSlug, setOpenSlug] = useState<string | null>(null);
 
   const work = useMemo(() => forLens(projects, lens), [lens]);
   const roles = useMemo(() => experienceFor(lens), [lens]);
@@ -41,11 +39,6 @@ export default function LensPage({ lens }: Props) {
 
   const activeId = useActiveSection(lensSections);
   useRevealAnimations(ready);
-
-  const openProject = useCallback((slug: string) => setOpenSlug(slug), []);
-  const openProjectData = openSlug
-    ? projects.find((p) => p.slug === openSlug) ?? null
-    : null;
 
   return (
     <>
@@ -66,19 +59,12 @@ export default function LensPage({ lens }: Props) {
 
       <main id="main" className="lens-page">
         <LensHero profile={profile} ready={ready} />
-        <SelectedWork projects={work} onOpen={openProject} />
+        <SelectedWork projects={work} />
         <ExperienceSection roles={roles} />
         <SkillsSection groups={profile.skills} />
-        <Achievements items={wins} onOpenProject={openProject} />
+        <Achievements items={wins} />
         <Contact />
       </main>
-
-      {openProjectData ? (
-        <ProjectLightbox
-          project={openProjectData}
-          onClose={() => setOpenSlug(null)}
-        />
-      ) : null}
     </>
   );
 }

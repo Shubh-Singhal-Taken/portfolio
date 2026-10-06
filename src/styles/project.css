@@ -1,0 +1,345 @@
+/* ============================================================
+   PROJECT PAGES — /projects/<slug>
+   ============================================================ */
+
+.project-page .section {
+  margin-bottom: clamp(100px, 14vh, 180px);
+}
+
+/* Header ------------------------------------------------------ */
+
+.case-hero {
+  max-width: 64rem;
+  padding-top: calc(64px + clamp(3rem, 9vh, 6rem));
+}
+
+.case-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+  color: var(--t-5);
+  font-size: 0.82rem;
+}
+
+.case-crumbs a {
+  color: var(--t-3);
+  transition: color 0.2s ease;
+}
+
+.case-crumbs a:hover,
+.case-crumbs a:focus-visible {
+  color: var(--t-1);
+}
+
+.case-hero__title {
+  margin-top: 1.25rem;
+  color: var(--t-1);
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  font-weight: 400;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.case-crumbs + .case-hero__title {
+  margin-top: 0;
+}
+
+.case-hero__tagline {
+  margin-top: 0.9rem;
+  color: var(--t-3);
+  font-size: clamp(1.05rem, 1.4vw, 1.3rem);
+}
+
+.case-facts {
+  display: grid;
+  grid-template-columns: auto 1.4fr 1.6fr;
+  gap: 1.5rem clamp(1.5rem, 4vw, 3.5rem);
+  margin-top: 2.75rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.case-facts dt {
+  color: var(--t-5);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.case-facts dd {
+  margin-top: 0.45rem;
+  color: var(--t-2);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.case-facts__metric {
+  color: var(--t-1) !important;
+  font-family: var(--font-display);
+  font-size: 1.25rem !important;
+}
+
+.case-lenses {
+  margin-top: 1.5rem;
+  color: var(--t-4);
+  font-size: 0.92rem;
+}
+
+.case-lenses a {
+  color: var(--t-1);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 0.25em;
+}
+
+.case-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.75rem;
+  margin-top: 1.5rem;
+}
+
+.case-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--t-1);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 0.2rem;
+}
+
+@media (max-width: 760px) {
+  .case-facts {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* Body -------------------------------------------------------- */
+
+/* Prose keeps a reading width; the diagram gets the whole section */
+.case-story,
+.case-stack {
+  max-width: 64rem;
+}
+
+.case-summary {
+  max-width: 52rem;
+  color: var(--t-1);
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.2vw, 1.9rem);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.case-media {
+  margin-top: 3rem;
+  overflow: hidden;
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+}
+
+.case-media video {
+  display: block;
+  width: 100%;
+}
+
+.case-story {
+  display: grid;
+  gap: 2.75rem;
+  margin-top: clamp(3rem, 7vh, 5rem);
+}
+
+.case-story__part {
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.3fr) 1fr;
+  gap: 1rem clamp(1.5rem, 4vw, 4rem);
+}
+
+.case-story__part h2,
+.case-stack h2 {
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding-top: 0.35rem;
+}
+
+.case-story__part p {
+  max-width: 62ch;
+  color: var(--t-2);
+  font-size: 1.02rem;
+  line-height: 1.8;
+}
+
+.case-stack {
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.3fr) 1fr;
+  gap: 1rem clamp(1.5rem, 4vw, 4rem);
+  margin-top: 2.75rem;
+}
+
+.case-stack .skill-group__list {
+  margin-top: 0;
+}
+
+@media (max-width: 760px) {
+  .case-story__part,
+  .case-stack {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Previous / next --------------------------------------------- */
+
+.case-next {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  padding-top: 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.case-next__link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.75rem 0.5rem;
+  color: var(--t-1);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+  transition: color 0.2s ease, gap 0.25s var(--ease-out);
+}
+
+.case-next__link small {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--t-5);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.case-next__link.is-next {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.case-next__link:hover,
+.case-next__link:focus-visible {
+  gap: 1.4rem;
+}
+
+.case-next__link svg {
+  color: var(--accent);
+  flex: none;
+}
+
+@media (max-width: 600px) {
+  .case-next {
+    grid-template-columns: 1fr;
+  }
+
+  .case-next__link.is-next {
+    justify-content: space-between;
+    text-align: left;
+  }
+}
+
+/* Architecture diagrams ---------------------------------------- */
+
+.diagram {
+  margin-top: 3rem;
+}
+
+.diagram__scroll {
+  overflow-x: auto;
+  padding: 1.25rem;
+  background: var(--panel-2);
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+}
+
+.diagram__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-inline: auto;
+}
+
+.diagram__node rect {
+  fill: var(--panel);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.diagram__node.is-store rect {
+  fill: var(--panel-3);
+}
+
+.diagram__node.is-client rect {
+  stroke-dasharray: 4 3;
+}
+
+.diagram__node.is-device rect {
+  fill: var(--panel-2);
+}
+
+.diagram__node.is-ai rect {
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+
+.diagram__label {
+  fill: var(--t-1);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.diagram__sub {
+  fill: var(--t-4);
+  font-family: var(--font-ui);
+  font-size: 11px;
+}
+
+.diagram__edge path {
+  fill: none;
+  stroke: var(--t-5);
+  stroke-width: 1.25;
+}
+
+.diagram__arrow {
+  fill: var(--t-5);
+}
+
+.diagram__edge-label {
+  fill: var(--t-4);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  paint-order: stroke;
+  stroke: var(--panel-2);
+  stroke-width: 4px;
+}
+
+.diagram__caption {
+  display: grid;
+  gap: 0.4rem;
+  max-width: 62ch;
+  margin-top: 1rem;
+  color: var(--t-3);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.diagram__caption span {
+  color: var(--t-5);
+  font-size: 0.85rem;
+}

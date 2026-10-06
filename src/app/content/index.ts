@@ -9,3 +9,4 @@ export * from "./projects";
 export * from "./recognition";
 export * from "./journey";
 export * from "./skills";
+export * from "./diagrams";

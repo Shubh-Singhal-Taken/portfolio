@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { medalColors, type Project } from "../../content";
 import { useI18n } from "../../lib/i18n";
@@ -7,7 +8,6 @@ import SectionTitle from "../primitives/SectionTitle";
 type Props = {
   /** Already ordered for the lens, strongest first. */
   projects: Project[];
-  onOpen: (slug: string) => void;
 };
 
 /* Three tiers, so the strongest proof gets the most room: one lead case
@@ -36,7 +36,7 @@ function Tags({ tags, limit }: { tags: string[]; limit: number }) {
   );
 }
 
-export default function SelectedWork({ projects, onOpen }: Props) {
+export default function SelectedWork({ projects }: Props) {
   const { t } = useI18n();
   const [lead, ...others] = projects;
   const pair = others.slice(0, 2);
@@ -55,10 +55,10 @@ export default function SelectedWork({ projects, onOpen }: Props) {
           <p className="work-lead__tagline">{lead.tagline}</p>
           <p className="work-lead__summary">{lead.summary}</p>
           <Tags tags={lead.tags} limit={8} />
-          <button type="button" className="work-open" onClick={() => onOpen(lead.slug)}>
+          <Link className="work-open" to={`/projects/${lead.slug}`}>
             {t("WORK-CASE")}
             <ArrowUpRight size={14} />
-          </button>
+          </Link>
         </div>
 
         <div className="work-lead__outcome">
@@ -81,14 +81,10 @@ export default function SelectedWork({ projects, onOpen }: Props) {
               <p className="work-card__tagline">{project.tagline}</p>
               <p className="work-card__metric">{project.metric}</p>
               <Tags tags={project.tags} limit={5} />
-              <button
-                type="button"
-                className="work-open"
-                onClick={() => onOpen(project.slug)}
-              >
+              <Link className="work-open" to={`/projects/${project.slug}`}>
                 {t("WORK-CASE")}
                 <ArrowUpRight size={14} />
-              </button>
+              </Link>
             </article>
           ))}
         </div>
@@ -100,16 +96,12 @@ export default function SelectedWork({ projects, onOpen }: Props) {
           <ul>
             {more.map((project) => (
               <li key={project.slug}>
-                <button
-                  type="button"
-                  className="work-more__row"
-                  onClick={() => onOpen(project.slug)}
-                >
+                <Link className="work-more__row" to={`/projects/${project.slug}`}>
                   <span className="work-more__name">{project.title}</span>
                   <span className="work-more__tagline">{project.tagline}</span>
                   <span className="work-more__date">{project.date}</span>
                   <ArrowUpRight size={14} aria-hidden="true" />
-                </button>
+                </Link>
               </li>
             ))}
           </ul>

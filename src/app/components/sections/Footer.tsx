@@ -1,7 +1,12 @@
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Gamepad2 } from "lucide-react";
 import { useI18n } from "../../lib/i18n";
 
-export default function Footer() {
+type Props = {
+  /** Present on the front page only: opens the space game. */
+  onPlayGame?: () => void;
+};
+
+export default function Footer({ onPlayGame }: Props) {
   const { t } = useI18n();
   const year = new Date().getFullYear();
 
@@ -10,6 +15,13 @@ export default function Footer() {
       <p className="copyright">
         {t("COPYRIGHT_TEXT").replace("{year}", String(year))}
       </p>
+
+      {onPlayGame ? (
+        <button type="button" className="footer-game-link" onClick={onPlayGame}>
+          <Gamepad2 size={14} aria-hidden="true" />
+          {t("GAME-OPEN")}
+        </button>
+      ) : null}
 
       <button
         type="button"

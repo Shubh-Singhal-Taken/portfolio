@@ -359,33 +359,6 @@
   }
 }
 
-/* ------------------------------------------------------------
-   GAME BUTTON
-   ------------------------------------------------------------ */
-
-.game-button {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 1.5rem;
-  padding: 0;
-  color: var(--accent);
-  opacity: 0.6;
-  transform: scale(0.8);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  z-index: var(--z-chrome);
-}
-
-.game-button:hover,
-.game-button:focus-visible {
-  opacity: 1;
-  transform: scale(1);
-}
-
-@media (max-width: 760px) {
-  .game-button {
-    display: none;
-  }
-}
 
 /* Page links inside the overlay: smaller than the section links */
 .nav-pages-item {

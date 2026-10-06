@@ -14,7 +14,7 @@ const item = (id: string, key: StringKey): NavItem => ({ id, href: `#${id}`, key
 export const homeSections: NavItem[] = [
   item("section-home", "HOME-MENU"),
   item("about", "ABOUT-MENU"),
-  item("service", "SERVICE-MENU"),
+  item("profiles", "PROFILES-MENU"),
   item("projects", "PROJECTS-MENU"),
   item("achievements", "AWARDS-MENU"),
   item("journey", "JOURNEY-MENU"),

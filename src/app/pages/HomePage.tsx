@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { useActiveSection } from "../lib/useActiveSection";
 import { homeSections } from "../lib/navigation";
@@ -9,19 +9,15 @@ import { identity, projects, projectsInOrder } from "../content";
 import PageMeta from "../components/PageMeta";
 import OverlayNav from "../components/chrome/OverlayNav";
 import DotNav from "../components/chrome/DotNav";
-import GameButton from "../components/chrome/GameButton";
 
 import Home from "../components/sections/Home";
 import About from "../components/sections/About";
-import Capabilities from "../components/sections/Capabilities";
+import Profiles from "../components/sections/Profiles";
 import Projects from "../components/sections/Projects";
 import Achievements from "../components/sections/Achievements";
 import Journey from "../components/sections/Journey";
 import Contact from "../components/sections/Contact";
 import ProjectLightbox from "../components/projects/ProjectLightbox";
-
-// The space-combat sim is a world of its own, never in the entry chunk.
-const Game = lazy(() => import("../game"));
 
 /** The front page: who Shubh is across all three disciplines. */
 export default function HomePage() {
@@ -29,7 +25,6 @@ export default function HomePage() {
   const [navOpen, setNavOpen] = useState(false);
   const [projectIndex, setProjectIndex] = useState(0);
   const [openSlug, setOpenSlug] = useState<string | null>(null);
-  const [gameOpen, setGameOpen] = useState(false);
 
   const activeId = useActiveSection(homeSections);
   useRevealAnimations(ready);
@@ -67,12 +62,11 @@ export default function HomePage() {
         onClose={() => setNavOpen(false)}
         activeId={activeId}
       />
-      <GameButton onLaunch={() => setGameOpen(true)} />
 
       <main id="main">
         <Home ready={ready} />
         <About />
-        <Capabilities />
+        <Profiles />
         <Projects
           index={projectIndex}
           onIndexChange={setProjectIndex}
@@ -88,12 +82,6 @@ export default function HomePage() {
           project={openProjectData}
           onClose={() => setOpenSlug(null)}
         />
-      ) : null}
-
-      {gameOpen ? (
-        <Suspense fallback={null}>
-          <Game onExit={() => setGameOpen(false)} />
-        </Suspense>
       ) : null}
     </>
   );

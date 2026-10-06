@@ -32,10 +32,10 @@ export default defineConfig(({ isSsrBuild }) => ({
   },
 
   ssr: {
-    // These ship browser-shaped packages that Node cannot import as-is;
-    // bundling them into the prerender build resolves them the same way
+    // gsap ships a browser-shaped package that Node cannot import as-is;
+    // bundling it into the prerender build resolves it the same way
     // the browser build does.
-    noExternal: ['gsap', 'typed.js'],
+    noExternal: ['gsap'],
   },
 
   ssgOptions: {

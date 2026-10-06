@@ -3,17 +3,13 @@
    language would come back as a parallel table keyed the same way. */
 
 const strings = {
-  "LOADER-TEXT": "AI / ML ENGINEER",
-  HOME: "| AI/ML & IOT ENGINEER |",
-  "HOME-TYPED-1": "AI/ML & IoT Engineer",
-  "HOME-TYPED-2": "Autonomous Systems Builder",
-  "HOME-TYPED-3": "Edge AI & Computer Vision",
-  "HOME-TYPED-4": "Robotics & Embedded Engineer",
+  "LOADER-TEXT": "Software · AI · IoT",
+  "HOME-ROLE": "Software · AI · IoT Engineer",
+  "HOME-SUB": "From the sensor on the bench to the model that reads it to the product people use.",
   "CONTACT-BTN": "Get In Touch",
 
   "HOME-MENU": "Home",
   "ABOUT-MENU": "About",
-  "SERVICE-MENU": "Capabilities",
   "PROJECTS-MENU": "Projects",
   "AWARDS-MENU": "Recognition",
   "JOURNEY-MENU": "Journey",
@@ -24,6 +20,9 @@ const strings = {
   "SKILLS-MENU": "Skills",
   "PAGES-LABEL": "Pages",
   "PROFILES-LABEL": "Profiles",
+  "PROFILES-MENU": "Profiles",
+  "PROFILES-TITLE": "Profiles",
+  "PROFILES-TEXT": "Three roles, one engineer. Pick the one you're hiring for.",
 
   "WORK-TITLE": "Selected work",
   "WORK-TEXT": "The builds that show it best, strongest first.",
@@ -43,9 +42,6 @@ const strings = {
   "CERTS-TITLE": "Certifications",
   "SOFT-SKILLS-TITLE": "Beyond the toolkit",
 
-  "SERVICE-TITLE": "Capabilities",
-  "SERVICE-TEXT":
-    "The engineering I do end to end — from the sensor on the bench to the model on the edge device to the team that ships it.",
 
   "PROJECT-TITLE": "Projects",
   "PROJECT-TEXT":
@@ -82,7 +78,7 @@ const strings = {
   COPYRIGHT_TEXT: "© {year} Shubh Singhal — All rights reserved.",
   FOOTER_PRIVACY_LINK: "Back to top",
 
-  "GAME-OPEN": "Open game",
+  "GAME-OPEN": "Play the space game",
   "GAME-BACK": "Back to portfolio",
   "MENU-OPEN": "Open menu",
   "MENU-CLOSE": "Close menu",

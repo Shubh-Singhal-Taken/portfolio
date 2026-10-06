@@ -1,5 +1,5 @@
 /* ============================================================
-   SECTIONS — home, about, capabilities, recognition,
+   SECTIONS — home, about, profiles, recognition,
    journey, contact, footer
    ============================================================ */
 
@@ -90,21 +90,22 @@
   margin-left: 0.35em;
 }
 
-.typed-wrapper {
-  width: 100%;
+.home-role {
   margin-top: 1.5rem;
-  background: transparent;
   color: var(--t-4);
   font-family: var(--font-ui);
-  font-size: clamp(0.8rem, 1.15vw, 1.2rem);
+  font-size: clamp(0.8rem, 1.1vw, 1.1rem);
   font-weight: 300;
   letter-spacing: 0.35em;
   text-transform: uppercase;
-  min-height: 2em;
 }
 
-.typed-wrapper .typed-cursor {
-  color: var(--accent);
+.home-sub {
+  max-width: 30rem;
+  margin: 1.25rem auto 0;
+  color: var(--t-3);
+  font-size: clamp(0.95rem, 1.1vw, 1.1rem);
+  line-height: 1.7;
 }
 
 .contact-Btn-wrapper {
@@ -183,42 +184,6 @@
   text-align: center;
   max-width: 80ch;
   margin-inline: auto;
-}
-
-.stat-strip {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  margin: 2.75rem 0 0.5rem;
-  padding: 1.5rem 0;
-  border-top: 1px solid var(--line-soft);
-  border-bottom: 1px solid var(--line-soft);
-}
-
-.stat-cell {
-  text-align: center;
-}
-
-.stat-value {
-  color: var(--t-1);
-  font-family: var(--font-display);
-  font-size: clamp(1.4rem, 2.2vw, 2.4rem);
-  line-height: 1.1;
-}
-
-.stat-label {
-  margin-top: 0.4rem;
-  color: var(--t-5);
-  font-size: 0.7rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-@media (max-width: 760px) {
-  .stat-strip {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem 1rem;
-  }
 }
 
 /* Tabs ------------------------------------------------------- */
@@ -388,76 +353,10 @@
   font-size: 0.75rem;
 }
 
-.our-skills {
-  display: flex;
-  flex-wrap: wrap;
+/* Skills in About: the lens pages' chip lists, centred in the panel */
+#about .skill-group__list {
   justify-content: center;
-  text-align: center;
-}
-
-.card {
-  position: relative;
-  display: inline-block;
-  vertical-align: top;
-  width: 8vw;
-  min-width: 92px;
-  height: 8vh;
-  min-height: 72px;
-  margin: 0.6%;
-  overflow: hidden;
-  background: #ffffff08;
-  border: 1px solid #ffffff10;
-  border-radius: 20px;
-  box-shadow: 20px 20px 50px #000c;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  text-align: center;
-}
-
-.card-face {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  padding: 0.4rem;
-  color: var(--t-3);
-  font-size: clamp(9px, 0.72vw, 0.8rem);
-  line-height: 1.3;
-}
-
-.card-content {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.4rem;
-  background: var(--accent-dim);
-  color: #fff;
-  font-size: clamp(9px, 0.72vw, 0.8rem);
-  font-weight: 700;
-  line-height: 1.3;
-  opacity: 0;
-  transform: translateY(100%);
-  transition: transform 0.5s var(--ease-out), opacity 0.5s var(--ease-out);
-}
-
-.card:hover .card-content,
-.card:focus-within .card-content {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-@media (max-width: 760px) {
-  .card {
-    width: 78px;
-    min-width: 78px;
-    height: 62px;
-    min-height: 62px;
-    margin: 5px;
-    border-radius: 14px;
-  }
+  margin-top: 1rem;
 }
 
 .btn-cv-border {
@@ -487,72 +386,83 @@
 }
 
 /* ------------------------------------------------------------
-   CAPABILITIES  (the reference's service block)
+   PROFILES — the three doors into the lens pages
    ------------------------------------------------------------ */
 
-.service-card-wrapper {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 2vw;
+.profile-rows {
   margin-top: 3rem;
-  text-align: center;
-  background: transparent;
+  border-top: 1px solid var(--line-soft);
 }
 
-.service-card {
-  position: relative;
-  display: grid;
-  place-items: center;
-  aspect-ratio: 11 / 14;
-  overflow: hidden;
-  border: 1px solid #ffffff0d;
-  border-radius: 10px;
+.profile-rows li + li .profile-row {
+  border-top: 1px solid var(--line-soft);
 }
 
-.service-card-icon {
+.profile-row {
   display: grid;
-  place-items: center;
-  width: 100%;
-  height: 100%;
+  grid-template-columns: minmax(11rem, 0.8fr) 2fr auto;
+  grid-template-areas:
+    "role headline go"
+    "role proof go";
+  align-items: center;
+  gap: 0.5rem clamp(1.5rem, 4vw, 4rem);
+  padding: clamp(1.75rem, 3.5vw, 2.75rem) clamp(0.5rem, 1.5vw, 1.25rem);
+  transition: background 0.3s ease;
+}
+
+.profile-row__role {
+  grid-area: role;
+  color: var(--t-4);
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.profile-row__headline {
+  grid-area: headline;
+  color: var(--t-1);
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.6vw, 2.4rem);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.profile-row__proof {
+  grid-area: proof;
+  color: var(--t-4);
+  font-size: 0.92rem;
+}
+
+.profile-row__go {
+  grid-area: go;
+  color: var(--t-4);
+  transition: color 0.3s ease, transform 0.3s var(--ease-out);
+}
+
+.profile-row:hover,
+.profile-row:focus-visible {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.profile-row:hover .profile-row__role,
+.profile-row:focus-visible .profile-row__role {
   color: var(--accent);
 }
 
-.service-card-text {
-  position: absolute;
-  bottom: 12%;
-  width: 100%;
-  color: var(--t-2);
-  font-size: clamp(11px, 1vw, 1rem);
-  font-weight: 300;
-  letter-spacing: 0.06em;
-  text-align: center;
+.profile-row:hover .profile-row__go,
+.profile-row:focus-visible .profile-row__go {
+  color: var(--t-1);
+  transform: translate(3px, -3px);
 }
 
-.service-card-content {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 1rem;
-  color: #ccc;
-  background: #000;
-  font-size: clamp(10.1px, 0.85vw, 0.95rem);
-  line-height: 1.55;
-  opacity: 0;
-  transform: translateY(200px);
-  transition: 0.8s all ease;
-}
-
-.service-card:hover .service-card-content,
-.service-card:focus-within .service-card-content {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-@media (max-width: 600px) {
-  .service-card-wrapper {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+@media (max-width: 760px) {
+  .profile-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "role go"
+      "headline headline"
+      "proof proof";
   }
 }
 
@@ -562,9 +472,24 @@
 
 .award-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(6, 1fr);
   gap: 1.25rem;
   margin-top: 3rem;
+}
+
+/* Spans are computed per row so every row fills exactly */
+.award-grid > .award-card {
+  grid-column: span var(--span, 2);
+}
+
+@media (max-width: 760px) {
+  .award-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .award-grid > .award-card {
+    grid-column: auto;
+  }
 }
 
 /* Medal rank reads through the icon and the event line, not a coloured
@@ -994,6 +919,21 @@
   font-size: 0.72rem;
   font-weight: 400;
   letter-spacing: 0.08em;
+}
+
+.footer-game-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: auto;
+  color: var(--t-5);
+  font-size: 0.72rem;
+  transition: color 0.3s ease;
+}
+
+.footer-game-link:hover,
+.footer-game-link:focus-visible {
+  color: var(--accent);
 }
 
 .footer-privacy-link {

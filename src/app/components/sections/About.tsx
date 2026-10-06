@@ -10,11 +10,9 @@ import {
   lenses,
   skillTiers,
   softSkills,
-  stats,
 } from "../../content";
 import { useI18n } from "../../lib/i18n";
 import SectionTitle from "../primitives/SectionTitle";
-import CountUp from "../primitives/CountUp";
 
 type Tab = "education" | "skills";
 
@@ -69,22 +67,6 @@ export default function About() {
         <p className="about-text" data-reveal>
           {aboutText}
         </p>
-
-        <div className="stat-strip" data-reveal>
-          {stats.map((stat) => (
-            <div className="stat-cell" key={stat.label}>
-              <div className="stat-value">
-                <CountUp
-                  target={stat.target}
-                  prefix={stat.prefix}
-                  suffix={stat.suffix}
-                  noCount={stat.noCount}
-                />
-              </div>
-              <div className="stat-label">{stat.label}</div>
-            </div>
-          ))}
-        </div>
 
         {/* Tabs ------------------------------------------------ */}
         <div className="tab-titles" role="tablist" aria-label={t("ABOUT-TITLE")}>
@@ -162,14 +144,11 @@ export default function About() {
                   <p>{tier.caption}</p>
                 </div>
 
-                <div className="our-skills">
+                <ul className="skill-group__list">
                   {tier.skills.map((skill) => (
-                    <div className="card" key={skill} tabIndex={0}>
-                      <div className="card-face">{skill}</div>
-                      <div className="card-content">{skill}</div>
-                    </div>
+                    <li key={skill}>{skill}</li>
                   ))}
-                </div>
+                </ul>
               </div>
             );
           })}
@@ -179,19 +158,11 @@ export default function About() {
               <h3>{t("SOFT-SKILLS-TITLE")}</h3>
             </div>
 
-            <div className="our-skills">
-              {softSkills.map((skill) => {
-                const Icon = skill.icon;
-                return (
-                  <div className="card" key={skill.label} tabIndex={0}>
-                    <div className="card-face">
-                      <Icon size={18} />
-                    </div>
-                    <div className="card-content">{skill.label}</div>
-                  </div>
-                );
-              })}
-            </div>
+            <ul className="skill-group__list">
+              {softSkills.map((skill) => (
+                <li key={skill.label}>{skill.label}</li>
+              ))}
+            </ul>
           </div>
         </div>
 

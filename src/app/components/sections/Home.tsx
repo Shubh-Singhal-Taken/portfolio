@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import Typed from "typed.js";
 import gsap from "gsap";
 import { identity } from "../../content";
 import { useI18n } from "../../lib/i18n";
@@ -12,7 +11,7 @@ type Props = { ready: boolean };
 /** Splits a word into per-letter spans so the reveal can stagger. */
 function Word({ text, serif }: { text: string; serif?: boolean }) {
   return (
-    <span className={`name-word${serif ? " name2" : ""}`}>
+    <span className={`name-word${serif ? " name2" : ""}`} aria-hidden="true">
       {Array.from(text).map((ch, i) => (
         <span className="letter" key={`${ch}-${i}`}>
           {ch}
@@ -24,12 +23,11 @@ function Word({ text, serif }: { text: string; serif?: boolean }) {
 
 export default function Home({ ready }: Props) {
   const { t } = useI18n();
-  const nameRef = useRef<HTMLDivElement>(null);
-  const typedElRef = useRef<HTMLSpanElement>(null);
+  const nameRef = useRef<HTMLHeadingElement>(null);
   const restRef = useRef<HTMLDivElement>(null);
 
-  // Letter reveal — held until the loader has cleared so it is not
-  // spent behind a black overlay.
+  // Letter reveal, held until the loader has cleared so it is not spent
+  // behind a black overlay.
   useEffect(() => {
     if (!ready) return;
 
@@ -64,51 +62,20 @@ export default function Home({ ready }: Props) {
     };
   }, [ready]);
 
-  // Typed.js role line.
-  useEffect(() => {
-    if (!ready || !typedElRef.current) return;
-
-    const strings = [
-      t("HOME-TYPED-1"),
-      t("HOME-TYPED-2"),
-      t("HOME-TYPED-3"),
-      t("HOME-TYPED-4"),
-    ];
-
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)")
-      .matches;
-
-    if (reduced) {
-      typedElRef.current.textContent = strings[0];
-      return;
-    }
-
-    const typed = new Typed(typedElRef.current, {
-      strings,
-      typeSpeed: 55,
-      backSpeed: 28,
-      backDelay: 2200,
-      startDelay: 600,
-      loop: true,
-      smartBackspace: true,
-    });
-
-    return () => typed.destroy();
-  }, [ready, t]);
-
   return (
     <section className="section" id="section-home" data-nav>
       <div className="hero-grid">
         <div className="home">
-          <div className="name-container" ref={nameRef}>
+          {/* Letters are split for the reveal; the heading's accessible
+              name is the whole name, read once. */}
+          <h1 className="name-container" ref={nameRef} aria-label={identity.name}>
             <Word text={identity.first} />
             <Word text={identity.last} serif />
-          </div>
+          </h1>
 
           <div ref={restRef}>
-            <div className="typed-wrapper">
-              <span className="typed" ref={typedElRef} />
-            </div>
+            <p className="home-role">{t("HOME-ROLE")}</p>
+            <p className="home-sub">{t("HOME-SUB")}</p>
 
             <div className="contact-Btn-wrapper">
               <button

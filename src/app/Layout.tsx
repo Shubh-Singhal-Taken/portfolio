@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { Outlet, ScrollRestoration, useLocation } from "react-router-dom";
 
 import { useThreeScene } from "./three/useThreeScene";
@@ -10,6 +10,9 @@ import LoadingScreen from "./components/chrome/LoadingScreen";
 import TopBar from "./components/chrome/TopBar";
 import Footer from "./components/sections/Footer";
 
+// The space-combat sim is a world of its own, never in the entry chunk.
+const Game = lazy(() => import("./game"));
+
 /* The shell every page shares: the WebGL scene, the loader and the
    footer. It stays mounted across route changes, so moving between the
    front page and a lens never rebuilds the 3D scene. */
@@ -17,6 +20,7 @@ import Footer from "./components/sections/Footer";
 export default function Layout() {
   const [progress, setProgress] = useState(0);
   const [ready, setReady] = useState(false);
+  const [gameOpen, setGameOpen] = useState(false);
   const { pathname } = useLocation();
 
   const canvasRef = useThreeScene({
@@ -50,8 +54,15 @@ export default function Layout() {
 
       <div className="shell">
         <Outlet />
-        <Footer />
+        {/* The game is a front-page easter egg, launched from the footer */}
+        <Footer onPlayGame={pathname === "/" ? () => setGameOpen(true) : undefined} />
       </div>
+
+      {gameOpen ? (
+        <Suspense fallback={null}>
+          <Game onExit={() => setGameOpen(false)} />
+        </Suspense>
+      ) : null}
 
       <ScrollRestoration />
     </SceneReadyContext.Provider>

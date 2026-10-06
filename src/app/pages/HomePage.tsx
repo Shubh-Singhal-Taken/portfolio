@@ -8,6 +8,7 @@ import { useSceneReady } from "../lib/sceneReady";
 import { identity } from "../content";
 
 import PageMeta from "../components/PageMeta";
+import { homeStructuredData } from "../lib/structuredData";
 import OverlayNav from "../components/chrome/OverlayNav";
 import DotNav from "../components/chrome/DotNav";
 
@@ -40,6 +41,8 @@ export default function HomePage() {
         title={`${identity.name} | ${identity.role}`}
         description={identity.description}
         path="/"
+        image="/og/home.jpg"
+        structuredData={homeStructuredData()}
       />
 
       <DotNav items={homeSections} activeId={activeId} />

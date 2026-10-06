@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import PageMeta from "../components/PageMeta";
+import { lensStructuredData } from "../lib/structuredData";
 import OverlayNav from "../components/chrome/OverlayNav";
 import DotNav from "../components/chrome/DotNav";
 import LensHero from "../components/lens/LensHero";
@@ -46,6 +47,8 @@ export default function LensPage({ lens }: Props) {
         title={`${identity.name} | ${profile.role}`}
         description={profile.description}
         path={profile.path}
+        image={`/og/${lens}.jpg`}
+        structuredData={lensStructuredData(lens)}
       />
 
       <DotNav items={lensSections} activeId={activeId} />

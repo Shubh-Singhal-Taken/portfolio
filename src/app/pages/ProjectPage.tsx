@@ -2,6 +2,7 @@ import { useState, type CSSProperties } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, ExternalLink, Github } from "lucide-react";
 import PageMeta from "../components/PageMeta";
+import { projectStructuredData } from "../lib/structuredData";
 import OverlayNav from "../components/chrome/OverlayNav";
 import ArchitectureDiagram from "../components/projects/ArchitectureDiagram";
 import NotFound from "./NotFound";
@@ -51,6 +52,8 @@ function ProjectPage({ slug }: { slug?: string }) {
         title={`${project.title}: ${project.tagline} | ${identity.name}`}
         description={project.summary}
         path={`/projects/${project.slug}`}
+        image={`/og/projects/${project.slug}.jpg`}
+        structuredData={projectStructuredData(project)}
       />
 
       <OverlayNav

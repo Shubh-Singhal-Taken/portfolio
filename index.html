@@ -4,15 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0f0f0f" />
-    <!-- Title, description, canonical and social tags are set per page
-         (src/app/components/PageMeta.tsx) and written in at build time. -->
+    <!-- Title, description, canonical, social tags and structured data are
+         set per page (src/app/components/PageMeta.tsx) at build time. -->
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Nanum+Myeongjo:wght@400;700&family=Bitter:ital,wght@0,300..900;1,300..900&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- The two faces the first screen renders in; the rest load on demand -->
+    <link rel="preload" href="/fonts/nanum-myeongjo-400-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/lato-400-latin.woff2" as="font" type="font/woff2" crossorigin />
   </head>
 
   <body>

@@ -271,7 +271,7 @@
 .graduation-title em {
   display: block;
   margin-top: 0.25rem;
-  color: var(--t-5);
+  color: var(--t-4);
   font-size: 0.75rem;
   font-style: normal;
   letter-spacing: 0.1em;
@@ -349,7 +349,7 @@
 }
 
 .skills-tier-head p {
-  color: var(--t-5);
+  color: var(--t-4);
   font-size: 0.75rem;
 }
 
@@ -447,7 +447,7 @@
 
 .profile-row:hover .profile-row__role,
 .profile-row:focus-visible .profile-row__role {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .profile-row:hover .profile-row__go,
@@ -520,7 +520,7 @@
 }
 
 .award-card__date {
-  color: var(--t-5);
+  color: var(--t-4);
   font-size: 0.7rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -561,7 +561,7 @@
 }
 
 .award-card__link:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   border-color: var(--accent);
 }
 
@@ -623,7 +623,7 @@
 }
 
 .timeline__date {
-  color: var(--t-5);
+  color: var(--t-4);
   font-size: 0.7rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -648,7 +648,7 @@
 
 .timeline__org {
   margin-top: 0.2rem;
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.8rem;
 }
 
@@ -700,7 +700,7 @@
 }
 
 .social-contact a:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   transform: translateX(4px);
 }
 
@@ -712,7 +712,7 @@
 #contact-form label {
   display: grid;
   gap: 0.4rem;
-  color: var(--t-5);
+  color: var(--t-4);
   font-size: 0.7rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -915,7 +915,7 @@
 }
 
 .copyright {
-  color: var(--t-5);
+  color: var(--t-4);
   font-size: 0.72rem;
   font-weight: 400;
   letter-spacing: 0.08em;
@@ -926,18 +926,18 @@
   align-items: center;
   gap: 0.45rem;
   margin-left: auto;
-  color: var(--t-5);
+  color: var(--t-4);
   font-size: 0.72rem;
   transition: color 0.3s ease;
 }
 
 .footer-game-link:hover,
 .footer-game-link:focus-visible {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .footer-privacy-link {
-  color: var(--t-5);
+  color: var(--t-4);
   font-size: 0.72rem;
   border-bottom: 1px solid transparent;
   transition: color 0.3s ease, border-color 0.3s ease;
@@ -963,7 +963,7 @@
 }
 
 .not-found__code {
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.8rem;
   letter-spacing: 0.3em;
 }

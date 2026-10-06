@@ -18,7 +18,7 @@
   flex-wrap: wrap;
   gap: 0.6rem;
   margin-bottom: 2rem;
-  color: var(--t-5);
+  color: var(--t-4);
   font-size: 0.82rem;
 }
 
@@ -63,7 +63,7 @@
 }
 
 .case-facts dt {
-  color: var(--t-5);
+  color: var(--t-4);
   font-size: 0.72rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -163,7 +163,7 @@
 
 .case-story__part h2,
 .case-stack h2 {
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.75rem;
   font-weight: 400;
   letter-spacing: 0.2em;
@@ -220,7 +220,7 @@
 .case-next__link small {
   display: block;
   margin-bottom: 0.35rem;
-  color: var(--t-5);
+  color: var(--t-4);
   font-family: var(--font-ui);
   font-size: 0.72rem;
   letter-spacing: 0.18em;
@@ -238,7 +238,7 @@
 }
 
 .case-next__link svg {
-  color: var(--accent);
+  color: var(--accent-text);
   flex: none;
 }
 
@@ -340,6 +340,6 @@
 }
 
 .diagram__caption span {
-  color: var(--t-5);
+  color: var(--t-4);
   font-size: 0.85rem;
 }

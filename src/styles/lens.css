@@ -188,7 +188,7 @@
 }
 
 .work-lead__outcome-label {
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.7rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -304,7 +304,7 @@
 }
 
 .work-more__date {
-  color: var(--t-5);
+  color: var(--t-4);
   font-size: 0.82rem;
   white-space: nowrap;
 }

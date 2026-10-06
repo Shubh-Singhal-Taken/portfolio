@@ -206,7 +206,7 @@
 
 .project-poster__tags span {
   padding: 0.2rem 0.55rem;
-  color: var(--t-5);
+  color: var(--t-4);
   font-size: clamp(8px, 0.62vw, 0.68rem);
   background: #ffffff0a;
   border-radius: 3px;
@@ -214,7 +214,7 @@
 
 .project-poster__cue {
   margin-top: 0.5rem;
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: clamp(8px, 0.62vw, 0.7rem);
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -248,7 +248,7 @@
 
 .card-info p {
   margin-top: 0.3rem;
-  color: var(--t-5);
+  color: var(--t-4);
   font-size: 0.78rem;
 }
 
@@ -285,7 +285,7 @@
 
 .carousel__counter {
   min-width: 5ch;
-  color: var(--t-5);
+  color: var(--t-4);
   font-size: 0.8rem;
   letter-spacing: 0.14em;
   text-align: center;

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { PortfolioScene } from "./scene";
+import type { WorldId } from "./worlds";
 import { onScrollChange } from "../lib/scroll";
 
 const prefersReducedMotion = () =>
@@ -10,10 +11,15 @@ type Options = {
   onProgress?: (fraction: number) => void;
   /** Fired once the first frame has actually been painted. */
   onReady?: () => void;
+  /** Which profile's world the background shows. */
+  world: WorldId;
 };
 
-export function useThreeScene({ onProgress, onReady }: Options) {
+export function useThreeScene({ onProgress, onReady, world }: Options) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const sceneRef = useRef<PortfolioScene | null>(null);
+  const worldRef = useRef(world);
+  worldRef.current = world;
 
   // Keep the callbacks in refs so changing them never rebuilds the scene.
   const progressRef = useRef(onProgress);
@@ -38,6 +44,9 @@ export function useThreeScene({ onProgress, onReady }: Options) {
     }
 
     const reduced = prefersReducedMotion();
+    sceneRef.current = scene;
+    // The first world appears in place; later switches morph.
+    scene.setWorld(worldRef.current, true);
     let frame = 0;
     let paused = false;
     let announced = false;
@@ -91,9 +100,20 @@ export function useThreeScene({ onProgress, onReady }: Options) {
       unsubscribe();
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibility);
+      sceneRef.current = null;
       scene.dispose();
     };
   }, []);
+
+  // Lens switches morph the world; under reduced motion it changes in
+  // place and one frame is redrawn.
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene) return;
+    const reduced = prefersReducedMotion();
+    scene.setWorld(world, reduced);
+    if (reduced) scene.render(false);
+  }, [world]);
 
   return canvasRef;
 }

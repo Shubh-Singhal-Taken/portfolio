@@ -17,6 +17,10 @@
   --line: #495057;
   --line-soft: #3b3b3b;
   --accent: #059400;
+  /* The accent as text: a shade lighter so small labels clear WCAG AA
+     (4.5:1) on panels as well as the page ground. Borders and fills keep
+     --accent. */
+  --accent-text: #0a9e05;
   --accent-dim: #0a2a0a;
   --success: #4caf50;
   --danger: #a33;

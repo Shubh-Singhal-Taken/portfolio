@@ -55,10 +55,11 @@ export function createStarLayers(): {
   return { points, disposables };
 }
 
-/* Every solid sits off to one side of the reading column so the type
-   in front of it is never fighting geometry for contrast. */
+/* Every solid sits off the reading column so the type in front of it is
+   never fighting geometry for contrast. */
 
-/** The wireframe torus that turns continuously past the hero. */
+/** The wireframe torus that turns continuously below the hero copy, in
+    the gap between the text column and the portrait. */
 export function createTorus() {
   const geometry = new THREE.TorusGeometry(10, 2.6, 12, 64);
   const material = new THREE.MeshStandardMaterial({
@@ -69,7 +70,7 @@ export function createTorus() {
   });
 
   const mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(-44, 10, -30);
+  mesh.position.set(0, -31, -30);
 
   return { mesh, disposable: { geometry, material } satisfies Disposable };
 }
@@ -155,7 +156,7 @@ export function createLights(): THREE.Light[] {
   // One lamp parked beside each solid, so an object lights up as the
   // camera reaches its section and falls dark again afterwards.
   const stations: Array<[number, number, number]> = [
-    [-36, 14, -22],
+    [0, -18, -16],
     [38, -8, -70],
     [-44, 18, -122],
     [42, 16, -178],

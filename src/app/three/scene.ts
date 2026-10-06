@@ -9,6 +9,7 @@ import {
   createTorus,
   type Disposable,
 } from "./objects";
+import { WorldField, type WorldId } from "./worlds";
 
 /** How far the camera travels along -Z across the full page scroll. */
 const CAMERA_TRAVEL = 300;
@@ -25,6 +26,7 @@ export class PortfolioScene {
   private disposables: Disposable[] = [];
   private stars: THREE.Points[] = [];
   private spinners: THREE.Object3D[] = [];
+  private world: WorldField;
   private clock = new THREE.Clock();
 
   /** Scroll progress, 0 → 1. Written by the host, read in render(). */
@@ -80,6 +82,11 @@ export class PortfolioScene {
     this.spinners = [torus.mesh, ico.mesh, box.mesh];
     step(0.68);
 
+    // The per-profile world ---------------------------------
+    this.world = new WorldField();
+    this.world.setViewport(window.innerHeight, Math.min(window.devicePixelRatio, 2));
+    this.scene.add(this.world.points);
+
     // Lights --------------------------------------------------
     for (const light of createLights()) this.scene.add(light);
 
@@ -87,6 +94,11 @@ export class PortfolioScene {
        haze over the whole frame, which destroys the near-black ground
        the palette depends on. The scene renders straight instead. */
     step(1);
+  }
+
+  /** Rearrange the background for a profile; instant skips the morph. */
+  setWorld(id: WorldId, instant = false) {
+    this.world.setWorld(id, instant);
   }
 
   setProgress(progress: number) {
@@ -103,6 +115,7 @@ export class PortfolioScene {
 
     this.renderer.setPixelRatio(dpr);
     this.renderer.setSize(w, h);
+    this.world.setViewport(h, dpr);
   }
 
   /** One frame. `animate` false renders a single static frame. */
@@ -132,6 +145,8 @@ export class PortfolioScene {
       this.stars.forEach((layer, i) => {
         layer.rotation.y = t * drift[i];
       });
+
+      this.world.update(delta, t);
     }
 
     this.renderer.render(this.scene, this.camera);
@@ -143,6 +158,7 @@ export class PortfolioScene {
       material.dispose();
     }
     this.disposables = [];
+    this.world.dispose();
     this.spinners = [];
     this.stars = [];
 

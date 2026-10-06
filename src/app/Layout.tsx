@@ -5,6 +5,8 @@ import { useThreeScene } from "./three/useThreeScene";
 import { refreshScroll } from "./lib/scroll";
 import { lockScroll } from "./lib/scrollLock";
 import { SceneReadyContext } from "./lib/sceneReady";
+import { LENSES, type Lens } from "./content";
+import type { WorldId } from "./three/worlds";
 
 import LoadingScreen from "./components/chrome/LoadingScreen";
 import TopBar from "./components/chrome/TopBar";
@@ -23,9 +25,16 @@ export default function Layout() {
   const [gameOpen, setGameOpen] = useState(false);
   const { pathname } = useLocation();
 
+  // A profile page shows its own world; everything else the neutral sky.
+  const segment = pathname.split("/")[1] ?? "";
+  const world: WorldId = (LENSES as readonly string[]).includes(segment)
+    ? (segment as Lens)
+    : "neutral";
+
   const canvasRef = useThreeScene({
     onProgress: setProgress,
     onReady: () => setReady(true),
+    world,
   });
 
   // Hold the page still behind the loader, then let it go and re-measure.

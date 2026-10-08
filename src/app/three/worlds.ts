@@ -4,8 +4,7 @@ import * as THREE from "three";
    itself when the visitor switches lens, so the background says which
    profile they are reading.
 
-   - software: stacked lattice layers the camera flies through, like the
-     tiers of a backend
+   - software: the plain star field, same as the neutral pages
    - ai:       dense clusters, like points in an embedding space
    - iot:      sensor nodes joined by dotted links, data in transit
    - neutral:  faint extra stars (front page, case studies, 404)
@@ -56,28 +55,6 @@ function neutral(rand: () => number): Layout {
     l.pos[i * 3 + 2] = FAR_Z - 30 + rand() * (NEAR_Z - FAR_Z + 30);
     l.size[i] = 0.45 + rand() * 0.55;
     l.alpha[i] = 0.18 + rand() * 0.3;
-  }
-  return l;
-}
-
-function software(rand: () => number): Layout {
-  // Five tiers along the flight path, each a regular lattice
-  const l = blank();
-  const layers = 5;
-  const perLayer = Math.floor(COUNT / layers);
-  const cols = 22;
-  const rows = Math.ceil(perLayer / cols);
-
-  for (let i = 0; i < COUNT; i++) {
-    const layer = Math.min(layers - 1, Math.floor(i / perLayer));
-    const k = i - layer * perLayer;
-    const c = k % cols;
-    const r = Math.floor(k / cols) % rows;
-    l.pos[i * 3] = (c / (cols - 1) - 0.5) * 132 + (rand() - 0.5) * 0.4;
-    l.pos[i * 3 + 1] = (r / (rows - 1) - 0.5) * 76 + (rand() - 0.5) * 0.4;
-    l.pos[i * 3 + 2] = -layer * 62 - 6;
-    l.size[i] = 0.75;
-    l.alpha[i] = 0.32;
   }
   return l;
 }
@@ -223,9 +200,10 @@ export class WorldField {
 
   constructor() {
     const rand = mulberry32(0x5ca1e);
+    const sky = neutral(rand);
     this.layouts = {
-      neutral: neutral(rand),
-      software: software(rand),
+      neutral: sky,
+      software: sky,
       ai: ai(rand),
       iot: iot(rand),
     };

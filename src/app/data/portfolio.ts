@@ -1,15 +1,18 @@
 import {
   Binary,
+  Bot,
   Brain,
   BrainCircuit,
   Cpu,
   Folder,
   Globe,
+  GraduationCap,
   Lightbulb,
   MessageCircle,
   Mic,
   Radar,
   Rocket,
+  ScrollText,
   Sparkles,
   Target,
   Trophy,
@@ -45,17 +48,48 @@ export const identity = {
   resume: "/resume.pdf"
 } as const;
 
-/* Navigation ----------------------------------------------- */
+/* Navigation lives in src/app/lib/navigation.ts, which pairs each
+   section with its translation key. */
 
-export const nav = [
-  { label: "Home", href: "#home" },
-  { label: "About", href: "#about" },
-  { label: "Skills", href: "#skills" },
-  { label: "Projects", href: "#projects" },
-  { label: "Achievements", href: "#achievements" },
-  { label: "Journey", href: "#journey" },
-  { label: "Contact", href: "#contact" }
-] as const;
+/* About copy ----------------------------------------------- */
+
+export const aboutText =
+  "I'm an AI/ML and IoT engineer who likes the part of the problem where software meets something physical — a camera, a motor, a drone in the air. Across five flagship builds I've owned perception pipelines, embedded architecture, and the integration work that makes them survive contact with the real world. Alongside that I lead the CSED Club as General Secretary and have mentored 400+ students.";
+
+/* Education ------------------------------------------------- */
+
+export type EducationEntry = {
+  qualification: string;
+  institution: string;
+  period: string;
+  note?: string;
+};
+
+export type CertificationGroup = {
+  title: string;
+  icon: LucideIcon;
+  items: string[];
+};
+
+export const education: EducationEntry[] = [
+  {
+    qualification: "B.Tech · Computer Science & Engineering",
+    institution: "GLA University, Mathura",
+    period: "2022 — 2026",
+    note: "Specialising in AI/ML, IoT and embedded systems"
+  }
+];
+
+/* TODO(shubh): add your certifications here — each group renders as a
+   collapsible branch under the Education tab. Delete any group you do
+   not need; an empty array simply renders nothing. */
+export const certifications: CertificationGroup[] = [
+  {
+    title: "Certifications & Coursework",
+    icon: ScrollText,
+    items: []
+  }
+];
 
 /* Stats ---------------------------------------------------- */
 
@@ -95,6 +129,47 @@ export const pillars: Pillar[] = [
     icon: Binary
   }
 ];
+
+/* Capabilities — the six hover cards. Expanded from the three
+   pillars above so each card names one thing done end to end. ---- */
+
+export type Capability = { title: string; text: string; icon: LucideIcon };
+
+export const capabilities: Capability[] = [
+  {
+    title: "AI & Computer Vision",
+    text: "From lane detection to LiDAR-based SLAM, I architect perception pipelines that stay performant in real-world noise on edge hardware.",
+    icon: BrainCircuit
+  },
+  {
+    title: "Embedded Systems",
+    text: "Microcontroller firmware, deterministic motor control, and sensor integration in Embedded C — the deterministic layer beneath every autonomous build.",
+    icon: Cpu
+  },
+  {
+    title: "Robotics & Autonomy",
+    text: "ROS architectures, SLAM, path planning, and flight control on Pixhawk — ground rovers and UAVs that navigate without a human in the loop.",
+    icon: Bot
+  },
+  {
+    title: "IoT & Edge AI",
+    text: "Long-range LoRaWAN and MQTT links, ESP32 and Raspberry Pi nodes, and models compressed to run on the device rather than in a datacentre.",
+    icon: Radar
+  },
+  {
+    title: "Full-Stack Development",
+    text: "Secure profiles, structured data capture, and AI-assisted analysis — the application layer that turns a working prototype into a usable product.",
+    icon: Globe
+  },
+  {
+    title: "Leadership & Mentoring",
+    text: "I lead engineering teams, run flagship workshops, and have personally mentored 400+ students — turning ideas into shipped, award-winning builds.",
+    icon: Users
+  }
+];
+
+/* Education icon used by the About tab strip. */
+export const educationIcon = GraduationCap;
 
 /* Skills — three evidence-based tiers ---------------------- */
 
@@ -483,6 +558,28 @@ export const journey: JourneyEntry[] = [
     type: "project"
   }
 ];
+
+/* Medal tints ---------------------------------------------- */
+
+/* Warm and cool greys rather than literal metals — the palette is
+   monochrome, so rank reads as temperature, not colour. `select`
+   borrows the one accent in the system. */
+export const medalColors: Record<Medal, string> = {
+  gold: "#d9c9a3",
+  silver: "#c6cbd1",
+  bronze: "#c0a08a",
+  select: "#059400"
+};
+
+/* Project media -------------------------------------------- */
+
+/* Drop an MP4 at public/videos/<slug>.mp4 and that project's carousel
+   face and lightbox switch from the typographic poster to the clip.
+   List the slugs you have supplied here. */
+export const projectVideos: Partial<Record<string, string>> = {};
+
+export const projectVideoSrc = (slug: string): string | undefined =>
+  projectVideos[slug];
 
 /* Marquee -------------------------------------------------- */
 

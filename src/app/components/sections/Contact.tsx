@@ -1,117 +1,158 @@
 import { useState, type FormEvent } from "react";
-import { motion } from "motion/react";
-import { toast } from "sonner";
-import { Download, Github, Linkedin, Mail, Send } from "lucide-react";
+import { Github, Linkedin, Mail, Send } from "lucide-react";
 import { identity } from "../../data/portfolio";
-import { useMotionPrefs, viewportOnce } from "../../lib/motion";
-import SectionHeading from "../primitives/SectionHeading";
-import Magnetic from "../primitives/Magnetic";
+import { useI18n } from "../../lib/i18n";
+import { sendContactMessage } from "../../lib/emailjs";
+import SectionTitle from "../primitives/SectionTitle";
+
+type Status = "idle" | "sending" | "sent" | "failed";
+
+function CheckIcon() {
+  return (
+    <div className="check-icon" aria-hidden="true">
+      <span className="icon-line line-tip" />
+      <span className="icon-line line-long" />
+      <div className="icon-circle" />
+      <div className="icon-fix" />
+    </div>
+  );
+}
+
+function BanIcon() {
+  return (
+    <div className="ban-icon" aria-hidden="true">
+      <span className="icon-line line-long-invert" />
+      <span className="icon-line line-long" />
+      <div className="icon-circle" />
+      <div className="icon-fix" />
+    </div>
+  );
+}
 
 export default function Contact() {
+  const { t } = useI18n();
+  const [status, setStatus] = useState<Status>("idle");
   const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const { fadeUp } = useMotionPrefs();
 
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    toast.success("Message sent! I'll get back to you soon.");
-    setForm({ name: "", email: "", message: "" });
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (status === "sending") return;
+
+    setStatus("sending");
+
+    try {
+      await sendContactMessage(form);
+      setForm({ name: "", email: "", message: "" });
+      setStatus("sent");
+    } catch {
+      setStatus("failed");
+    }
   };
 
   return (
-    <section id="contact" className="section container">
-      <SectionHeading
-        eyebrow="06 / Contact"
-        title={
-          <>
-            Let's build something <span className="gradient-text">that ships.</span>
-          </>
-        }
-      />
+    <section className="section contact" id="contact" data-nav>
+      <SectionTitle title={t("CONTACT-TITLE")} />
 
       <div className="contact-grid">
-        <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce}>
-          <p className="contact-lead">
-            I'm open to internships, full-time roles, and ambitious collaborations where applied
-            AI and IoT can create measurable impact. The fastest way to reach me is below.
-          </p>
+        <div data-reveal>
+          <p className="contact-lead">{t("CONTACT-TEXT")}</p>
 
-          <div className="hero-actions" style={{ marginTop: "1.8rem" }}>
-            <Magnetic>
-              <a href={identity.resume} className="btn btn-ghost" download>
-                Download Resume <Download size={15} />
-              </a>
-            </Magnetic>
-          </div>
-
-          <div className="contact-links">
-            <a className="contact-link" href={`mailto:${identity.email}`}>
-              <Mail size={16} /> {identity.email}
+          <div className="social-contact">
+            <a href={`mailto:${identity.email}`}>
+              <Mail size={17} />
+              {identity.email}
             </a>
             <a
-              className="contact-link"
               href={identity.linkedin}
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Linkedin size={16} /> linkedin.com/in/{identity.linkedinHandle}
+              <Linkedin size={17} />
+              {identity.linkedinHandle}
             </a>
-            <a
-              className="contact-link"
-              href={identity.github}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Github size={16} /> github.com/{identity.githubHandle}
+            <a href={identity.github} target="_blank" rel="noopener noreferrer">
+              <Github size={17} />
+              {identity.githubHandle}
             </a>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.form
-          className="contact-form"
-          onSubmit={handleSubmit}
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={viewportOnce}
-        >
-          <h3>Send a message</h3>
-          <div className="field">
-            <label htmlFor="contact-name">Name</label>
-            <input
-              id="contact-name"
-              required
-              type="text"
-              placeholder="Your name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="contact-email">Email</label>
-            <input
-              id="contact-email"
-              required
-              type="email"
-              placeholder="your@email.com"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="contact-message">Message</label>
-            <textarea
-              id="contact-message"
-              required
-              rows={5}
-              placeholder="Tell me about your project..."
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-            />
-          </div>
-          <button type="submit" className="btn btn-solid">
-            Send Message <Send size={15} />
-          </button>
-        </motion.form>
+        <div data-reveal>
+          {status === "sent" || status === "failed" ? (
+            <div className="delivering" role="status" aria-live="polite">
+              {status === "sent" ? <CheckIcon /> : <BanIcon />}
+              <p className="message">
+                {status === "sent" ? t("SUCCESS") : t("FAILED")}
+              </p>
+              <button
+                type="button"
+                className="sendBtn"
+                onClick={() => setStatus("idle")}
+              >
+                {status === "sent" ? t("PROJECT-CLOSE") : t("SEND-SPAN")}
+              </button>
+            </div>
+          ) : (
+            <form id="contact-form" onSubmit={onSubmit}>
+              <label>
+                {t("FORM-NAME")}
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  autoComplete="name"
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, name: e.target.value }))
+                  }
+                />
+              </label>
+
+              <label>
+                {t("FORM-EMAIL")}
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  autoComplete="email"
+                  value={form.email}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, email: e.target.value }))
+                  }
+                />
+              </label>
+
+              <label>
+                {t("FORM-MESSAGE")}
+                <textarea
+                  name="message"
+                  required
+                  value={form.message}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, message: e.target.value }))
+                  }
+                />
+              </label>
+
+              <div className="button-container">
+                <button
+                  className="sendBtn"
+                  type="submit"
+                  disabled={status === "sending"}
+                >
+                  <span className="sentSpan">
+                    {status === "sending" ? t("SEND-SENDING") : t("SEND-SPAN")}
+                  </span>
+                  {status === "sending" ? (
+                    <span className="spinner" />
+                  ) : (
+                    <Send size={13} />
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
       </div>
     </section>
   );

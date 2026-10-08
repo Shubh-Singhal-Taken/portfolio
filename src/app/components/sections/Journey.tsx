@@ -1,70 +1,86 @@
-import { useRef, type CSSProperties } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { journey, journeyIcons, journeyLabels } from "../../data/portfolio";
-import { EASE, viewportOnce } from "../../lib/motion";
-import SectionHeading from "../primitives/SectionHeading";
+import { useI18n } from "../../lib/i18n";
+import SectionTitle from "../primitives/SectionTitle";
 
-/** Cyan→purple down the timeline: newest (top) is cyan, oldest (bottom) purple. */
-function dotAccent(i: number, n: number) {
-  const pct = n <= 1 ? 0 : Math.round((i / (n - 1)) * 100);
-  return `color-mix(in oklab, var(--accent), var(--accent-2) ${pct}%)`;
-}
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Journey() {
-  const ref = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion() ?? false;
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 75%", "end 65%"] });
-  const scaleY = useTransform(scrollYProgress, [0, 1], [reduce ? 1 : 0, 1]);
-  const n = journey.length;
+  const { t } = useI18n();
+  const railRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
-  const item = {
-    hidden: { opacity: 0, x: reduce ? 0 : -28, filter: reduce ? "blur(0px)" : "blur(6px)" },
-    visible: {
-      opacity: 1,
-      x: 0,
-      filter: "blur(0px)",
-      transition: { duration: reduce ? 0 : 0.6, ease: EASE }
+  useEffect(() => {
+    const rail = railRef.current;
+    const list = listRef.current;
+    if (!rail || !list) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      gsap.set(rail, { scaleY: 1 });
+      return;
     }
-  };
+
+    // The rail fills as the timeline passes through the viewport.
+    const tween = gsap.fromTo(
+      rail,
+      { scaleY: 0 },
+      {
+        scaleY: 1,
+        ease: "none",
+        scrollTrigger: {
+          trigger: list,
+          start: "top 75%",
+          end: "bottom 65%",
+          scrub: 0.4,
+        },
+      }
+    );
+
+    return () => {
+      tween.scrollTrigger?.kill();
+      tween.kill();
+    };
+  }, []);
 
   return (
-    <section id="journey" className="section container">
-      <SectionHeading
-        eyebrow="05 / Journey"
-        title="From first hackathon to General Secretary."
-        lead="Two and a half years of builds, wins, workshops, and leadership — the milestones that shaped how I engineer and lead."
-      />
+    <section className="section" id="journey" data-nav>
+      <SectionTitle title={t("JOURNEY-TITLE")} lead={t("JOURNEY-TEXT")} />
 
-      <div className="timeline" ref={ref}>
-        <div className="timeline-line">
-          <motion.div className="timeline-progress" style={{ scaleY }} />
+      <div className="timeline" ref={listRef}>
+        <div className="timeline__rail" aria-hidden="true">
+          <div className="timeline__progress" ref={railRef} />
         </div>
 
-        {journey.map((j, i) => {
-          const Icon = journeyIcons[j.type];
-          return (
-            <motion.article
-              className="timeline-item"
-              key={`${j.title}-${j.order}`}
-              style={{ "--dot-accent": dotAccent(i, n) } as CSSProperties}
-              variants={item}
-              initial="hidden"
-              whileInView="visible"
-              viewport={viewportOnce}
-            >
-              <span className="timeline-dot" aria-hidden="true">
-                <Icon size={13} />
-              </span>
-              <div className="timeline-meta">
-                <span className="timeline-period">{j.date}</span>
-                <span className="timeline-type">{journeyLabels[j.type]}</span>
-              </div>
-              <h3 className="timeline-role">{j.title}</h3>
-              <p className="timeline-org">{j.org}</p>
-              <p className="timeline-detail">{j.detail}</p>
-            </motion.article>
-          );
-        })}
+        <ol>
+          {journey.map((entry) => {
+            const Icon = journeyIcons[entry.type];
+
+            return (
+              <li
+                className="timeline__item"
+                key={`${entry.order}-${entry.title}`}
+                data-reveal
+              >
+                <span className="timeline__dot" aria-hidden="true">
+                  <Icon size={11} />
+                </span>
+
+                <div className="timeline__meta">
+                  <span className="timeline__date">{entry.date}</span>
+                  <span className="timeline__type">
+                    {journeyLabels[entry.type]}
+                  </span>
+                </div>
+
+                <h3>{entry.title}</h3>
+                <p className="timeline__org">{entry.org}</p>
+                <p>{entry.detail}</p>
+              </li>
+            );
+          })}
+        </ol>
       </div>
     </section>
   );
